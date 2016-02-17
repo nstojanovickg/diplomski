@@ -1,0 +1,139 @@
+.form-mysmall{
+    margin-bottom: 5px;
+}
+
+.form-mysmall .form-control{
+    height: 28px;
+    padding: 4px 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+.form-horizontal .form-group.form-mysmall{
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.row.myfix{
+    padding-right: 15px;
+}
+@media (max-width: 768px) {
+    .row.myfix {
+        padding-left: 15px;
+    }
+}
+
+.form-mysmall .input-group-addon{
+    padding: 3px 6px;
+}
+.mywrapper{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.add-info .glyphicon{
+    top: 0;
+}
+
+.form-mysmall .glyphicon{
+    top: 2px;
+}
+
+.add-info{
+    padding: 5px;
+}
+
+.col-xs-12.col-md-4.mywrapper{
+    padding-left: 0;
+    padding-right: 0;
+}
+.col-xs-12.col-md-8.mywrapper{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.dropdown-submenu{position:relative;}
+.dropdown-submenu>.dropdown-menu{top:0;left:100%;margin-top:-6px;margin-left:-1px;-webkit-border-radius:0 6px 6px 6px;-moz-border-radius:0 6px 6px 6px;border-radius:0 6px 6px 6px;}
+.dropdown-submenu:hover>.dropdown-menu{display:block;}
+.dropdown-submenu>a:after{display:block;content:" ";float:right;width:0;height:0;border-color:transparent;border-style:solid;border-width:5px 0 5px 5px;border-left-color:#cccccc;margin-top:5px;margin-right:-10px;}
+.dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
+.dropdown-submenu.pull-left{float:none;}
+.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
+
+
+.form-mysmall .input-group[class*="col-"] {
+  float: none;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#findpolicy tbody tr.highlight td {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+#findpolicy tbody tr td {
+    cursor: pointer;
+    cursor: hand;
+}
+
+#findcustomer tbody tr.highlight td {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+#findcustomer tbody tr td {
+    cursor: pointer;
+    cursor: hand;
+}
+
+#historytable tbody tr.highlight td {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+#historytable tbody tr td {
+    cursor: pointer;
+    cursor: hand;
+}
+
+#historytable2 tbody tr.highlight td {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+#historytable2 tbody tr td {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.list-left{
+    padding-left: 15px;
+}
+
+.form-group.credential-padding .form-group{
+    margin-bottom: 5px;
+}
+
+.back-button{
+    padding-top: 0;
+}
+
+.form-group.form-filter .control-label{
+    width: 100%;
+}
+
+.list-pagination .pagination{
+    margin-bottom: 0;
+}
+.list-pagination{
+    padding-left: 5px;
+}
+.pagination-info{
+    font-size: 11px;
+}
+
+.list-pagination .pagination.pagination-sm > li > a,.list-pagination .pagination.pagination-sm > li > span {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.panel {
+    background-color: #f0f0f0;
+}
