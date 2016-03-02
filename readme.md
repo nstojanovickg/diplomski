@@ -1,27 +1,45 @@
-## Laravel PHP Framework
+## Razvoj web bazirane aplikacije za sms prijavu ispita
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+###Instructions for full setup:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
+**Notice**: Install composer and git tools
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
+Clone this project to your path.
+```sh
+git clone https://github.com/nstojanovickg/diplomski.git
+```
 
-## Official Documentation
+**Notice**: *storage* dir and **.env** file are not in git, so you need to create them manualy.
+*.env* contains nessesary constants with sensitive data.
+*storage* and *bootstrap/cache* directories should be writable by your web server.
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+Via composer update (will install if they are not installed) necessary packages.
+```sh
+composer update
+```
 
-## Contributing
+Autoload full classmap files.
+```sh
+composer dump-autoload --optimize
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+Set up database. You can find database dump file in *database* dir, named *sms_application_dump.sql*.
 
-## Security Vulnerabilities
+Run propel command to generate models.
+```sh
+php artisan propel:model:build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+In *config/auth.php* change driver to propel.
 
-### License
+Autoload full classmap files again to add models.
+```sh
+composer dump-autoload --optimize
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+Clear application cache.
+```sh
+php artisan cache:clear
+```
+
+That's it, you should be ready.
