@@ -51,7 +51,7 @@ class ApplicationList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = ApplicationQuery::create();
+		$this->objects = ApplicationQuery::create()->orderByCreatedAt('desc');
 		
 		if(isset($array['StudentId']) && $array['StudentId'] !== "") $this->objects->where("application.student_id = ".$array['StudentId']);
 		if(isset($array['SubjectId']) && $array['SubjectId'] !== "") $this->objects->where("application.subject_id = ".$array['SubjectId']);

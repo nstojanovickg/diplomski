@@ -40,6 +40,7 @@
 			data:  result_arr[document.getElementById("chart_year").value],
 			xkey: 'rok',
 			ykeys: ['polozili', 'pali', 'odustali'],
+			yLabelFormat: function(y){return y != Math.round(y)?'':y;},
 			labels: labels
 		});
 		
@@ -53,6 +54,7 @@
 				data:  new_result_arr[document.getElementById("chart_course").value],
 				xkey: 'xkey',
 				ykeys: ['prijavljeno'],
+				yLabelFormat: function(y){return y != Math.round(y)?'':y;},
 				labels: ['Prijavili ispit']
 			});
 		<?php

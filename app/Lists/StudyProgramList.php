@@ -31,12 +31,13 @@ class StudyProgramList extends BaseList {
 		
 		$this->setPaginationForm($cnt, $page, $path);
 		
+		$year_arr = [1=>'I',2=>'II',3=>'III',4=>'IV'];
 	    foreach($this->objects->paginate($page, $this->maxPerPage) as $key => $object){
 			$id = $object->getSubjectId()."/".$object->getCourseId();
 			$this->data_arr[$id]['#'] = ($page - 1) * $this->maxPerPage + $key+1;
 			$this->data_arr[$id]['subject'] = $object->getSubject()->__toString();
 			$this->data_arr[$id]['course'] = $object->getCourse()->__toString();
-			$this->data_arr[$id]['year'] = $object->getYear();
+			$this->data_arr[$id]['year'] = $year_arr[$object->getYear()];
 			$this->data_arr[$id]['semester'] = $object->getSemester();
 	    }
     }
