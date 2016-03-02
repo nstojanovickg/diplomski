@@ -10,20 +10,12 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-
+Route::get('nowsms', 'NowSmsController@index');
 Route::group(['middleware' => 'auth'], function()
 {
 	Route::get(		'/', 								'DashboardController@index');
 	Route::get(		'dashboard', 						'DashboardController@index');
-    /*
-	Route::get('/', function(){
-        return view('dashboard');
-    });
-    Route::get('dashboard', function(){
-        return view('dashboard');
-    });
-    */
-	
+    
 	Route::patch(	'admin/ac_manage', 					'AdminUserController@index');
 	Route::get(		'admin/ac_manage/page/{page}', 		'AdminUserController@index');
     Route::resource('admin/ac_manage', 					'AdminUserController');
@@ -41,9 +33,9 @@ Route::group(['middleware' => 'auth'], function()
 	Route::patch(	'engagement/engagement', 			'EngagementController@index');
 	Route::get(		'engagement/engagement/page/{page}','EngagementController@index');
     Route::resource('engagement/engagement', 			'EngagementController');
-	Route::get(		'engagement/engagement/{professor_id}/{student_id}/{course_id}/{school_year_id}/edit','EngagementController@edit');
-	Route::patch(	'engagement/engagement/{professor_id}/{student_id}/{course_id}/{school_year_id}','EngagementController@update');
-	Route::delete(	'engagement/engagement/{professor_id}/{student_id}/{course_id}/{school_year_id}','EngagementController@destroy');
+	Route::get(		'engagement/engagement/{subject_id}/{course_id}/{school_year_id}/edit','EngagementController@edit');
+	Route::patch(	'engagement/engagement/{subject_id}/{course_id}/{school_year_id}','EngagementController@update');
+	Route::delete(	'engagement/engagement/{subject_id}/{course_id}/{school_year_id}','EngagementController@destroy');
 	
 	Route::patch(	'basic/subject', 					'SubjectController@index');
 	Route::get(		'basic/subject/page/{page}',		'SubjectController@index');
@@ -68,16 +60,25 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get(		'basic/professor/page/{page}',		'ProfessorController@index');
     Route::resource('basic/professor', 					'ProfessorController');
 	
-	Route::patch(	'basic/school_year', 					'SchoolYearController@index');
-	Route::get(		'basic/school_year/page/{page}',		'SchoolYearController@index');
-    Route::resource('basic/school_year', 					'SchoolYearController');
+	Route::patch(	'basic/school_year', 				'SchoolYearController@index');
+	Route::get(		'basic/school_year/page/{page}',	'SchoolYearController@index');
+    Route::resource('basic/school_year', 				'SchoolYearController');
 	
-	Route::patch(	'basic/study_program', 					'StudyProgramController@index');
-	Route::get(		'basic/study_program/page/{page}',		'StudyProgramController@index');
-    Route::resource('basic/study_program', 					'StudyProgramController');
+	Route::patch(	'basic/study_program', 				'StudyProgramController@index');
+	Route::get(		'basic/study_program/page/{page}',	'StudyProgramController@index');
+    Route::resource('basic/study_program', 				'StudyProgramController');
 	Route::get(		'basic/study_program/{subject_id}/{course_id}/edit','StudyProgramController@edit');
 	Route::patch(	'basic/study_program/{subject_id}/{course_id}','StudyProgramController@update');
 	Route::delete(	'basic/study_program/{subject_id}/{course_id}','StudyProgramController@destroy');
+	
+	Route::patch(	'additional_info/application_request', 				'ApplicationRequestController@index');
+	Route::get(		'additional_info/application_request/page/{page}',	'ApplicationRequestController@index');
+    Route::resource('additional_info/application_request', 				'ApplicationRequestController');
+	
+	Route::patch(	'additional_info/application_by_subject', 				'ApplicationBySubjectController@index');
+	Route::get(		'additional_info/application_by_subject/page/{page}',	'ApplicationBySubjectController@index');
+    Route::resource('additional_info/application_by_subject', 				'ApplicationBySubjectController');
+	Route::post(	'additional_info/application_by_subject/{subject_id}/{school_year_id}/{course_id}', 'ApplicationBySubjectController@getApplications');
 });
 
 Route::controllers([

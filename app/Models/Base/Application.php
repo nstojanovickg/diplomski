@@ -7,8 +7,8 @@ use \Exception;
 use \PDO;
 use App\Models\Application as ChildApplication;
 use App\Models\ApplicationQuery as ChildApplicationQuery;
-use App\Models\OralExamInvitation as ChildOralExamInvitation;
-use App\Models\OralExamInvitationQuery as ChildOralExamInvitationQuery;
+use App\Models\ApplicationRequest as ChildApplicationRequest;
+use App\Models\ApplicationRequestQuery as ChildApplicationRequestQuery;
 use App\Models\Period as ChildPeriod;
 use App\Models\PeriodQuery as ChildPeriodQuery;
 use App\Models\SchoolYear as ChildSchoolYear;
@@ -23,6 +23,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -103,12 +104,6 @@ abstract class Application implements ActiveRecordInterface
     protected $school_year_id;
 
     /**
-     * The value for the oral_exam_invitation_id field.
-     * @var        int
-     */
-    protected $oral_exam_invitation_id;
-
-    /**
      * The value for the application_date field.
      * @var        \DateTime
      */
@@ -146,11 +141,6 @@ abstract class Application implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ChildOralExamInvitation
-     */
-    protected $aOralExamInvitation;
-
-    /**
      * @var        ChildPeriod
      */
     protected $aPeriod;
@@ -171,12 +161,24 @@ abstract class Application implements ActiveRecordInterface
     protected $aSchoolYear;
 
     /**
+     * @var        ObjectCollection|ChildApplicationRequest[] Collection to store aggregation of ChildApplicationRequest objects.
+     */
+    protected $collApplicationRequests;
+    protected $collApplicationRequestsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildApplicationRequest[]
+     */
+    protected $applicationRequestsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -459,16 +461,6 @@ abstract class Application implements ActiveRecordInterface
     }
 
     /**
-     * Get the [oral_exam_invitation_id] column value.
-     *
-     * @return int
-     */
-    public function getOralExamInvitationId()
-    {
-        return $this->oral_exam_invitation_id;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [application_date] column value.
      *
      *
@@ -519,7 +511,7 @@ abstract class Application implements ActiveRecordInterface
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getExamTime($format = '%X')
+    public function getExamTime($format = 'H:i:s')
     {
         if ($format === null) {
             return $this->exam_time;
@@ -693,30 +685,6 @@ abstract class Application implements ActiveRecordInterface
 
         return $this;
     } // setSchoolYearId()
-
-    /**
-     * Set the value of [oral_exam_invitation_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\App\Models\Application The current object (for fluent API support)
-     */
-    public function setOralExamInvitationId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->oral_exam_invitation_id !== $v) {
-            $this->oral_exam_invitation_id = $v;
-            $this->modifiedColumns[ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID] = true;
-        }
-
-        if ($this->aOralExamInvitation !== null && $this->aOralExamInvitation->getId() !== $v) {
-            $this->aOralExamInvitation = null;
-        }
-
-        return $this;
-    } // setOralExamInvitationId()
 
     /**
      * Sets the value of [application_date] column to a normalized version of the date/time value specified.
@@ -895,34 +863,31 @@ abstract class Application implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ApplicationTableMap::translateFieldName('SchoolYearId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->school_year_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ApplicationTableMap::translateFieldName('OralExamInvitationId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->oral_exam_invitation_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ApplicationTableMap::translateFieldName('ApplicationDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ApplicationTableMap::translateFieldName('ApplicationDate', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00') {
                 $col = null;
             }
             $this->application_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ApplicationTableMap::translateFieldName('ExamDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ApplicationTableMap::translateFieldName('ExamDate', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00') {
                 $col = null;
             }
             $this->exam_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ApplicationTableMap::translateFieldName('ExamTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ApplicationTableMap::translateFieldName('ExamTime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->exam_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ApplicationTableMap::translateFieldName('ExamScore', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ApplicationTableMap::translateFieldName('ExamScore', TableMap::TYPE_PHPNAME, $indexType)];
             $this->exam_score = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ApplicationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ApplicationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ApplicationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ApplicationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -935,7 +900,7 @@ abstract class Application implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 12; // 12 = ApplicationTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = ApplicationTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\App\\Models\\Application'), 0, $e);
@@ -968,9 +933,6 @@ abstract class Application implements ActiveRecordInterface
         }
         if ($this->aSchoolYear !== null && $this->school_year_id !== $this->aSchoolYear->getId()) {
             $this->aSchoolYear = null;
-        }
-        if ($this->aOralExamInvitation !== null && $this->oral_exam_invitation_id !== $this->aOralExamInvitation->getId()) {
-            $this->aOralExamInvitation = null;
         }
     } // ensureConsistency
 
@@ -1011,11 +973,12 @@ abstract class Application implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aOralExamInvitation = null;
             $this->aPeriod = null;
             $this->aSubject = null;
             $this->aStudent = null;
             $this->aSchoolYear = null;
+            $this->collApplicationRequests = null;
+
         } // if (deep)
     }
 
@@ -1132,13 +1095,6 @@ abstract class Application implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aOralExamInvitation !== null) {
-                if ($this->aOralExamInvitation->isModified() || $this->aOralExamInvitation->isNew()) {
-                    $affectedRows += $this->aOralExamInvitation->save($con);
-                }
-                $this->setOralExamInvitation($this->aOralExamInvitation);
-            }
-
             if ($this->aPeriod !== null) {
                 if ($this->aPeriod->isModified() || $this->aPeriod->isNew()) {
                     $affectedRows += $this->aPeriod->save($con);
@@ -1176,6 +1132,24 @@ abstract class Application implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->applicationRequestsScheduledForDeletion !== null) {
+                if (!$this->applicationRequestsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->applicationRequestsScheduledForDeletion as $applicationRequest) {
+                        // need to save related object because we set the relation to null
+                        $applicationRequest->save($con);
+                    }
+                    $this->applicationRequestsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collApplicationRequests !== null) {
+                foreach ($this->collApplicationRequests as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -1218,9 +1192,6 @@ abstract class Application implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ApplicationTableMap::COL_SCHOOL_YEAR_ID)) {
             $modifiedColumns[':p' . $index++]  = 'school_year_id';
-        }
-        if ($this->isColumnModified(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'oral_exam_invitation_id';
         }
         if ($this->isColumnModified(ApplicationTableMap::COL_APPLICATION_DATE)) {
             $modifiedColumns[':p' . $index++]  = 'application_date';
@@ -1265,9 +1236,6 @@ abstract class Application implements ActiveRecordInterface
                         break;
                     case 'school_year_id':
                         $stmt->bindValue($identifier, $this->school_year_id, PDO::PARAM_INT);
-                        break;
-                    case 'oral_exam_invitation_id':
-                        $stmt->bindValue($identifier, $this->oral_exam_invitation_id, PDO::PARAM_INT);
                         break;
                     case 'application_date':
                         $stmt->bindValue($identifier, $this->application_date ? $this->application_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1365,24 +1333,21 @@ abstract class Application implements ActiveRecordInterface
                 return $this->getSchoolYearId();
                 break;
             case 5:
-                return $this->getOralExamInvitationId();
-                break;
-            case 6:
                 return $this->getApplicationDate();
                 break;
-            case 7:
+            case 6:
                 return $this->getExamDate();
                 break;
-            case 8:
+            case 7:
                 return $this->getExamTime();
                 break;
-            case 9:
+            case 8:
                 return $this->getExamScore();
                 break;
-            case 10:
+            case 9:
                 return $this->getCreatedAt();
                 break;
-            case 11:
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1420,16 +1385,21 @@ abstract class Application implements ActiveRecordInterface
             $keys[2] => $this->getSubjectId(),
             $keys[3] => $this->getPeriodId(),
             $keys[4] => $this->getSchoolYearId(),
-            $keys[5] => $this->getOralExamInvitationId(),
-            $keys[6] => $this->getApplicationDate(),
-            $keys[7] => $this->getExamDate(),
-            $keys[8] => $this->getExamTime(),
-            $keys[9] => $this->getExamScore(),
-            $keys[10] => $this->getCreatedAt(),
-            $keys[11] => $this->getUpdatedAt(),
+            $keys[5] => $this->getApplicationDate(),
+            $keys[6] => $this->getExamDate(),
+            $keys[7] => $this->getExamTime(),
+            $keys[8] => $this->getExamScore(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
 
         $utc = new \DateTimeZone('utc');
+        if ($result[$keys[5]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[5]];
+            $result[$keys[5]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+
         if ($result[$keys[6]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
             $dateTime = clone $result[$keys[6]];
@@ -1442,10 +1412,10 @@ abstract class Application implements ActiveRecordInterface
             $result[$keys[7]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
-        if ($result[$keys[8]] instanceof \DateTime) {
+        if ($result[$keys[9]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[8]];
-            $result[$keys[8]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+            $dateTime = clone $result[$keys[9]];
+            $result[$keys[9]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         if ($result[$keys[10]] instanceof \DateTime) {
@@ -1454,33 +1424,12 @@ abstract class Application implements ActiveRecordInterface
             $result[$keys[10]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
-        if ($result[$keys[11]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[11]];
-            $result[$keys[11]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
-        }
-
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aOralExamInvitation) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'oralExamInvitation';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'oral_exam_invitation';
-                        break;
-                    default:
-                        $key = 'OralExamInvitation';
-                }
-
-                $result[$key] = $this->aOralExamInvitation->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aPeriod) {
 
                 switch ($keyType) {
@@ -1541,6 +1490,21 @@ abstract class Application implements ActiveRecordInterface
 
                 $result[$key] = $this->aSchoolYear->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collApplicationRequests) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'applicationRequests';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'application_requests';
+                        break;
+                    default:
+                        $key = 'ApplicationRequests';
+                }
+
+                $result[$key] = $this->collApplicationRequests->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1591,24 +1555,21 @@ abstract class Application implements ActiveRecordInterface
                 $this->setSchoolYearId($value);
                 break;
             case 5:
-                $this->setOralExamInvitationId($value);
-                break;
-            case 6:
                 $this->setApplicationDate($value);
                 break;
-            case 7:
+            case 6:
                 $this->setExamDate($value);
                 break;
-            case 8:
+            case 7:
                 $this->setExamTime($value);
                 break;
-            case 9:
+            case 8:
                 $this->setExamScore($value);
                 break;
-            case 10:
+            case 9:
                 $this->setCreatedAt($value);
                 break;
-            case 11:
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1653,25 +1614,22 @@ abstract class Application implements ActiveRecordInterface
             $this->setSchoolYearId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setOralExamInvitationId($arr[$keys[5]]);
+            $this->setApplicationDate($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setApplicationDate($arr[$keys[6]]);
+            $this->setExamDate($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setExamDate($arr[$keys[7]]);
+            $this->setExamTime($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setExamTime($arr[$keys[8]]);
+            $this->setExamScore($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setExamScore($arr[$keys[9]]);
+            $this->setCreatedAt($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setCreatedAt($arr[$keys[10]]);
-        }
-        if (array_key_exists($keys[11], $arr)) {
-            $this->setUpdatedAt($arr[$keys[11]]);
+            $this->setUpdatedAt($arr[$keys[10]]);
         }
     }
 
@@ -1728,9 +1686,6 @@ abstract class Application implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ApplicationTableMap::COL_SCHOOL_YEAR_ID)) {
             $criteria->add(ApplicationTableMap::COL_SCHOOL_YEAR_ID, $this->school_year_id);
-        }
-        if ($this->isColumnModified(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID)) {
-            $criteria->add(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $this->oral_exam_invitation_id);
         }
         if ($this->isColumnModified(ApplicationTableMap::COL_APPLICATION_DATE)) {
             $criteria->add(ApplicationTableMap::COL_APPLICATION_DATE, $this->application_date);
@@ -1840,13 +1795,26 @@ abstract class Application implements ActiveRecordInterface
         $copyObj->setSubjectId($this->getSubjectId());
         $copyObj->setPeriodId($this->getPeriodId());
         $copyObj->setSchoolYearId($this->getSchoolYearId());
-        $copyObj->setOralExamInvitationId($this->getOralExamInvitationId());
         $copyObj->setApplicationDate($this->getApplicationDate());
         $copyObj->setExamDate($this->getExamDate());
         $copyObj->setExamTime($this->getExamTime());
         $copyObj->setExamScore($this->getExamScore());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getApplicationRequests() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addApplicationRequest($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1873,57 +1841,6 @@ abstract class Application implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildOralExamInvitation object.
-     *
-     * @param  ChildOralExamInvitation $v
-     * @return $this|\App\Models\Application The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setOralExamInvitation(ChildOralExamInvitation $v = null)
-    {
-        if ($v === null) {
-            $this->setOralExamInvitationId(NULL);
-        } else {
-            $this->setOralExamInvitationId($v->getId());
-        }
-
-        $this->aOralExamInvitation = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildOralExamInvitation object, it will not be re-added.
-        if ($v !== null) {
-            $v->addApplication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildOralExamInvitation object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildOralExamInvitation The associated ChildOralExamInvitation object.
-     * @throws PropelException
-     */
-    public function getOralExamInvitation(ConnectionInterface $con = null)
-    {
-        if ($this->aOralExamInvitation === null && ($this->oral_exam_invitation_id !== null)) {
-            $this->aOralExamInvitation = ChildOralExamInvitationQuery::create()->findPk($this->oral_exam_invitation_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aOralExamInvitation->addApplications($this);
-             */
-        }
-
-        return $this->aOralExamInvitation;
     }
 
     /**
@@ -2130,6 +2047,240 @@ abstract class Application implements ActiveRecordInterface
         return $this->aSchoolYear;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('ApplicationRequest' == $relationName) {
+            return $this->initApplicationRequests();
+        }
+    }
+
+    /**
+     * Clears out the collApplicationRequests collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addApplicationRequests()
+     */
+    public function clearApplicationRequests()
+    {
+        $this->collApplicationRequests = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collApplicationRequests collection loaded partially.
+     */
+    public function resetPartialApplicationRequests($v = true)
+    {
+        $this->collApplicationRequestsPartial = $v;
+    }
+
+    /**
+     * Initializes the collApplicationRequests collection.
+     *
+     * By default this just sets the collApplicationRequests collection to an empty array (like clearcollApplicationRequests());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initApplicationRequests($overrideExisting = true)
+    {
+        if (null !== $this->collApplicationRequests && !$overrideExisting) {
+            return;
+        }
+        $this->collApplicationRequests = new ObjectCollection();
+        $this->collApplicationRequests->setModel('\App\Models\ApplicationRequest');
+    }
+
+    /**
+     * Gets an array of ChildApplicationRequest objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildApplication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildApplicationRequest[] List of ChildApplicationRequest objects
+     * @throws PropelException
+     */
+    public function getApplicationRequests(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collApplicationRequestsPartial && !$this->isNew();
+        if (null === $this->collApplicationRequests || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collApplicationRequests) {
+                // return empty collection
+                $this->initApplicationRequests();
+            } else {
+                $collApplicationRequests = ChildApplicationRequestQuery::create(null, $criteria)
+                    ->filterByApplication($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collApplicationRequestsPartial && count($collApplicationRequests)) {
+                        $this->initApplicationRequests(false);
+
+                        foreach ($collApplicationRequests as $obj) {
+                            if (false == $this->collApplicationRequests->contains($obj)) {
+                                $this->collApplicationRequests->append($obj);
+                            }
+                        }
+
+                        $this->collApplicationRequestsPartial = true;
+                    }
+
+                    return $collApplicationRequests;
+                }
+
+                if ($partial && $this->collApplicationRequests) {
+                    foreach ($this->collApplicationRequests as $obj) {
+                        if ($obj->isNew()) {
+                            $collApplicationRequests[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collApplicationRequests = $collApplicationRequests;
+                $this->collApplicationRequestsPartial = false;
+            }
+        }
+
+        return $this->collApplicationRequests;
+    }
+
+    /**
+     * Sets a collection of ChildApplicationRequest objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $applicationRequests A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildApplication The current object (for fluent API support)
+     */
+    public function setApplicationRequests(Collection $applicationRequests, ConnectionInterface $con = null)
+    {
+        /** @var ChildApplicationRequest[] $applicationRequestsToDelete */
+        $applicationRequestsToDelete = $this->getApplicationRequests(new Criteria(), $con)->diff($applicationRequests);
+
+
+        $this->applicationRequestsScheduledForDeletion = $applicationRequestsToDelete;
+
+        foreach ($applicationRequestsToDelete as $applicationRequestRemoved) {
+            $applicationRequestRemoved->setApplication(null);
+        }
+
+        $this->collApplicationRequests = null;
+        foreach ($applicationRequests as $applicationRequest) {
+            $this->addApplicationRequest($applicationRequest);
+        }
+
+        $this->collApplicationRequests = $applicationRequests;
+        $this->collApplicationRequestsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ApplicationRequest objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ApplicationRequest objects.
+     * @throws PropelException
+     */
+    public function countApplicationRequests(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collApplicationRequestsPartial && !$this->isNew();
+        if (null === $this->collApplicationRequests || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collApplicationRequests) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getApplicationRequests());
+            }
+
+            $query = ChildApplicationRequestQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByApplication($this)
+                ->count($con);
+        }
+
+        return count($this->collApplicationRequests);
+    }
+
+    /**
+     * Method called to associate a ChildApplicationRequest object to this object
+     * through the ChildApplicationRequest foreign key attribute.
+     *
+     * @param  ChildApplicationRequest $l ChildApplicationRequest
+     * @return $this|\App\Models\Application The current object (for fluent API support)
+     */
+    public function addApplicationRequest(ChildApplicationRequest $l)
+    {
+        if ($this->collApplicationRequests === null) {
+            $this->initApplicationRequests();
+            $this->collApplicationRequestsPartial = true;
+        }
+
+        if (!$this->collApplicationRequests->contains($l)) {
+            $this->doAddApplicationRequest($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildApplicationRequest $applicationRequest The ChildApplicationRequest object to add.
+     */
+    protected function doAddApplicationRequest(ChildApplicationRequest $applicationRequest)
+    {
+        $this->collApplicationRequests[]= $applicationRequest;
+        $applicationRequest->setApplication($this);
+    }
+
+    /**
+     * @param  ChildApplicationRequest $applicationRequest The ChildApplicationRequest object to remove.
+     * @return $this|ChildApplication The current object (for fluent API support)
+     */
+    public function removeApplicationRequest(ChildApplicationRequest $applicationRequest)
+    {
+        if ($this->getApplicationRequests()->contains($applicationRequest)) {
+            $pos = $this->collApplicationRequests->search($applicationRequest);
+            $this->collApplicationRequests->remove($pos);
+            if (null === $this->applicationRequestsScheduledForDeletion) {
+                $this->applicationRequestsScheduledForDeletion = clone $this->collApplicationRequests;
+                $this->applicationRequestsScheduledForDeletion->clear();
+            }
+            $this->applicationRequestsScheduledForDeletion[]= $applicationRequest;
+            $applicationRequest->setApplication(null);
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
@@ -2137,9 +2288,6 @@ abstract class Application implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aOralExamInvitation) {
-            $this->aOralExamInvitation->removeApplication($this);
-        }
         if (null !== $this->aPeriod) {
             $this->aPeriod->removeApplication($this);
         }
@@ -2157,7 +2305,6 @@ abstract class Application implements ActiveRecordInterface
         $this->subject_id = null;
         $this->period_id = null;
         $this->school_year_id = null;
-        $this->oral_exam_invitation_id = null;
         $this->application_date = null;
         $this->exam_date = null;
         $this->exam_time = null;
@@ -2183,9 +2330,14 @@ abstract class Application implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collApplicationRequests) {
+                foreach ($this->collApplicationRequests as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aOralExamInvitation = null;
+        $this->collApplicationRequests = null;
         $this->aPeriod = null;
         $this->aSubject = null;
         $this->aStudent = null;

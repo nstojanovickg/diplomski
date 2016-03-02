@@ -15,6 +15,7 @@
 		</select>
 		<div id="applications" style="height: 250px;"></div>
 		@if(!empty($new_stats_arr))
+			<h1>{{ $period_year }}</h1>
 			{{ Lang::get('general.COURSE') }}:
 			<select id="chart_course" onchange="changeSecondChart()">
 				@foreach ($courses as $course)
@@ -50,7 +51,7 @@
 			var newChartApplications = Morris.Bar({
 				element: 'new_applications',
 				data:  new_result_arr[document.getElementById("chart_course").value],
-				xkey: 'predmet',
+				xkey: 'xkey',
 				ykeys: ['prijavljeno'],
 				labels: ['Prijavili ispit']
 			});
@@ -59,6 +60,10 @@
 		?>
 		function changeFirstChart() {
 			var x = document.getElementById("chart_year").value;
+			chartApplications.setData(result_arr[x]);
+		};
+		function changeSecondChart() {
+			var x = document.getElementById("chart_course").value;
 			newChartApplications.setData(new_result_arr[x]);
 		};
 	</script>

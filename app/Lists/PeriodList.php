@@ -47,11 +47,15 @@ class PeriodList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = PeriodSchoolYearQuery::create();
+		$this->objects = PeriodSchoolYearQuery::create()
+			->useSchoolYearQuery()
+				->orderByYear('desc')
+			->endUse()
+			->usePeriodQuery()
+				->orderBySequence()
+			->endUse();
         if(isset($array['PeriodId']) && $array['PeriodId'] !== "") $this->objects->where("PeriodSchoolYear.period_id = ?",$array['PeriodId']);
         if(isset($array['SchoolYearId']) && $array['SchoolYearId'] !== "") $this->objects->where("PeriodSchoolYear.school_year_id = ?",$array['SchoolYearId']);
-		//if(isset($array['DateStart']) && $array['DateStart'] !== "") $this->objects->where("PeriodSchoolYear.date_start >= ?",$array['DateStart']);
-        //if(isset($array['DateEnd']) && $array['DateEnd'] !== "") $this->objects->where("PeriodSchoolYear.date_end <= ?",$array['DateEnd']);
 		
 		if($search) session(['period_filter' => $array]);
 	}

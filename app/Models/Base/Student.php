@@ -13,8 +13,6 @@ use App\Models\Course as ChildCourse;
 use App\Models\CourseQuery as ChildCourseQuery;
 use App\Models\SchoolYear as ChildSchoolYear;
 use App\Models\SchoolYearQuery as ChildSchoolYearQuery;
-use App\Models\SmsCallLog as ChildSmsCallLog;
-use App\Models\SmsCallLogQuery as ChildSmsCallLogQuery;
 use App\Models\Student as ChildStudent;
 use App\Models\StudentQuery as ChildStudentQuery;
 use App\Models\Map\StudentTableMap;
@@ -122,13 +120,6 @@ abstract class Student implements ActiveRecordInterface
     protected $birthday;
 
     /**
-     * The value for the account_amount field.
-     * Note: this column has a database default value of: 0
-     * @var        double
-     */
-    protected $account_amount;
-
-    /**
      * The value for the phone_number field.
      * @var        string
      */
@@ -169,12 +160,6 @@ abstract class Student implements ActiveRecordInterface
     protected $collApplicationsPartial;
 
     /**
-     * @var        ObjectCollection|ChildSmsCallLog[] Collection to store aggregation of ChildSmsCallLog objects.
-     */
-    protected $collSmsCallLogs;
-    protected $collSmsCallLogsPartial;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -195,29 +180,10 @@ abstract class Student implements ActiveRecordInterface
     protected $applicationsScheduledForDeletion = null;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildSmsCallLog[]
-     */
-    protected $smsCallLogsScheduledForDeletion = null;
-
-    /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->account_amount = 0;
-    }
-
-    /**
      * Initializes internal state of App\Models\Base\Student object.
-     * @see applyDefaults()
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -521,16 +487,6 @@ abstract class Student implements ActiveRecordInterface
     }
 
     /**
-     * Get the [account_amount] column value.
-     *
-     * @return double
-     */
-    public function getAccountAmount()
-    {
-        return $this->account_amount;
-    }
-
-    /**
      * Get the [phone_number] column value.
      *
      * @return string
@@ -749,26 +705,6 @@ abstract class Student implements ActiveRecordInterface
     } // setBirthday()
 
     /**
-     * Set the value of [account_amount] column.
-     *
-     * @param double $v new value
-     * @return $this|\App\Models\Student The current object (for fluent API support)
-     */
-    public function setAccountAmount($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->account_amount !== $v) {
-            $this->account_amount = $v;
-            $this->modifiedColumns[StudentTableMap::COL_ACCOUNT_AMOUNT] = true;
-        }
-
-        return $this;
-    } // setAccountAmount()
-
-    /**
      * Set the value of [phone_number] column.
      *
      * @param string $v new value
@@ -838,10 +774,6 @@ abstract class Student implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->account_amount !== 0) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -895,19 +827,16 @@ abstract class Student implements ActiveRecordInterface
             }
             $this->birthday = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : StudentTableMap::translateFieldName('AccountAmount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->account_amount = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : StudentTableMap::translateFieldName('PhoneNumber', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : StudentTableMap::translateFieldName('PhoneNumber', TableMap::TYPE_PHPNAME, $indexType)];
             $this->phone_number = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : StudentTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : StudentTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : StudentTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : StudentTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -920,7 +849,7 @@ abstract class Student implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 12; // 12 = StudentTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = StudentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\App\\Models\\Student'), 0, $e);
@@ -992,8 +921,6 @@ abstract class Student implements ActiveRecordInterface
             $this->collAdminUsers = null;
 
             $this->collApplications = null;
-
-            $this->collSmsCallLogs = null;
 
         } // if (deep)
     }
@@ -1170,23 +1097,6 @@ abstract class Student implements ActiveRecordInterface
                 }
             }
 
-            if ($this->smsCallLogsScheduledForDeletion !== null) {
-                if (!$this->smsCallLogsScheduledForDeletion->isEmpty()) {
-                    \App\Models\SmsCallLogQuery::create()
-                        ->filterByPrimaryKeys($this->smsCallLogsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->smsCallLogsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collSmsCallLogs !== null) {
-                foreach ($this->collSmsCallLogs as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             $this->alreadyInSave = false;
 
         }
@@ -1237,9 +1147,6 @@ abstract class Student implements ActiveRecordInterface
         if ($this->isColumnModified(StudentTableMap::COL_BIRTHDAY)) {
             $modifiedColumns[':p' . $index++]  = 'birthday';
         }
-        if ($this->isColumnModified(StudentTableMap::COL_ACCOUNT_AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'account_amount';
-        }
         if ($this->isColumnModified(StudentTableMap::COL_PHONE_NUMBER)) {
             $modifiedColumns[':p' . $index++]  = 'phone_number';
         }
@@ -1283,9 +1190,6 @@ abstract class Student implements ActiveRecordInterface
                         break;
                     case 'birthday':
                         $stmt->bindValue($identifier, $this->birthday ? $this->birthday->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'account_amount':
-                        $stmt->bindValue($identifier, $this->account_amount, PDO::PARAM_STR);
                         break;
                     case 'phone_number':
                         $stmt->bindValue($identifier, $this->phone_number, PDO::PARAM_STR);
@@ -1383,15 +1287,12 @@ abstract class Student implements ActiveRecordInterface
                 return $this->getBirthday();
                 break;
             case 8:
-                return $this->getAccountAmount();
-                break;
-            case 9:
                 return $this->getPhoneNumber();
                 break;
-            case 10:
+            case 9:
                 return $this->getCreatedAt();
                 break;
-            case 11:
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1432,10 +1333,9 @@ abstract class Student implements ActiveRecordInterface
             $keys[5] => $this->getLastName(),
             $keys[6] => $this->getBirthPlace(),
             $keys[7] => $this->getBirthday(),
-            $keys[8] => $this->getAccountAmount(),
-            $keys[9] => $this->getPhoneNumber(),
-            $keys[10] => $this->getCreatedAt(),
-            $keys[11] => $this->getUpdatedAt(),
+            $keys[8] => $this->getPhoneNumber(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
 
         $utc = new \DateTimeZone('utc');
@@ -1445,16 +1345,16 @@ abstract class Student implements ActiveRecordInterface
             $result[$keys[7]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
+        if ($result[$keys[9]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[9]];
+            $result[$keys[9]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+
         if ($result[$keys[10]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
             $dateTime = clone $result[$keys[10]];
             $result[$keys[10]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
-        }
-
-        if ($result[$keys[11]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[11]];
-            $result[$keys[11]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1523,21 +1423,6 @@ abstract class Student implements ActiveRecordInterface
 
                 $result[$key] = $this->collApplications->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collSmsCallLogs) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'smsCallLogs';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'sms_call_logs';
-                        break;
-                    default:
-                        $key = 'SmsCallLogs';
-                }
-
-                $result[$key] = $this->collSmsCallLogs->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
         }
 
         return $result;
@@ -1597,15 +1482,12 @@ abstract class Student implements ActiveRecordInterface
                 $this->setBirthday($value);
                 break;
             case 8:
-                $this->setAccountAmount($value);
-                break;
-            case 9:
                 $this->setPhoneNumber($value);
                 break;
-            case 10:
+            case 9:
                 $this->setCreatedAt($value);
                 break;
-            case 11:
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1659,16 +1541,13 @@ abstract class Student implements ActiveRecordInterface
             $this->setBirthday($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setAccountAmount($arr[$keys[8]]);
+            $this->setPhoneNumber($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setPhoneNumber($arr[$keys[9]]);
+            $this->setCreatedAt($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setCreatedAt($arr[$keys[10]]);
-        }
-        if (array_key_exists($keys[11], $arr)) {
-            $this->setUpdatedAt($arr[$keys[11]]);
+            $this->setUpdatedAt($arr[$keys[10]]);
         }
     }
 
@@ -1734,9 +1613,6 @@ abstract class Student implements ActiveRecordInterface
         }
         if ($this->isColumnModified(StudentTableMap::COL_BIRTHDAY)) {
             $criteria->add(StudentTableMap::COL_BIRTHDAY, $this->birthday);
-        }
-        if ($this->isColumnModified(StudentTableMap::COL_ACCOUNT_AMOUNT)) {
-            $criteria->add(StudentTableMap::COL_ACCOUNT_AMOUNT, $this->account_amount);
         }
         if ($this->isColumnModified(StudentTableMap::COL_PHONE_NUMBER)) {
             $criteria->add(StudentTableMap::COL_PHONE_NUMBER, $this->phone_number);
@@ -1840,7 +1716,6 @@ abstract class Student implements ActiveRecordInterface
         $copyObj->setLastName($this->getLastName());
         $copyObj->setBirthPlace($this->getBirthPlace());
         $copyObj->setBirthday($this->getBirthday());
-        $copyObj->setAccountAmount($this->getAccountAmount());
         $copyObj->setPhoneNumber($this->getPhoneNumber());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1859,12 +1734,6 @@ abstract class Student implements ActiveRecordInterface
             foreach ($this->getApplications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addApplication($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getSmsCallLogs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addSmsCallLog($relObj->copy($deepCopy));
                 }
             }
 
@@ -2016,9 +1885,6 @@ abstract class Student implements ActiveRecordInterface
         }
         if ('Application' == $relationName) {
             return $this->initApplications();
-        }
-        if ('SmsCallLog' == $relationName) {
-            return $this->initSmsCallLogs();
         }
     }
 
@@ -2525,31 +2391,6 @@ abstract class Student implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return ObjectCollection|ChildApplication[] List of ChildApplication objects
      */
-    public function getApplicationsJoinOralExamInvitation(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildApplicationQuery::create(null, $criteria);
-        $query->joinWith('OralExamInvitation', $joinBehavior);
-
-        return $this->getApplications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Student is new, it will return
-     * an empty collection; or if this Student has previously
-     * been saved, it will retrieve related Applications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Student.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildApplication[] List of ChildApplication objects
-     */
     public function getApplicationsJoinPeriod(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildApplicationQuery::create(null, $criteria);
@@ -2609,299 +2450,6 @@ abstract class Student implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collSmsCallLogs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addSmsCallLogs()
-     */
-    public function clearSmsCallLogs()
-    {
-        $this->collSmsCallLogs = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collSmsCallLogs collection loaded partially.
-     */
-    public function resetPartialSmsCallLogs($v = true)
-    {
-        $this->collSmsCallLogsPartial = $v;
-    }
-
-    /**
-     * Initializes the collSmsCallLogs collection.
-     *
-     * By default this just sets the collSmsCallLogs collection to an empty array (like clearcollSmsCallLogs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initSmsCallLogs($overrideExisting = true)
-    {
-        if (null !== $this->collSmsCallLogs && !$overrideExisting) {
-            return;
-        }
-        $this->collSmsCallLogs = new ObjectCollection();
-        $this->collSmsCallLogs->setModel('\App\Models\SmsCallLog');
-    }
-
-    /**
-     * Gets an array of ChildSmsCallLog objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildStudent is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     * @throws PropelException
-     */
-    public function getSmsCallLogs(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                // return empty collection
-                $this->initSmsCallLogs();
-            } else {
-                $collSmsCallLogs = ChildSmsCallLogQuery::create(null, $criteria)
-                    ->filterByStudent($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collSmsCallLogsPartial && count($collSmsCallLogs)) {
-                        $this->initSmsCallLogs(false);
-
-                        foreach ($collSmsCallLogs as $obj) {
-                            if (false == $this->collSmsCallLogs->contains($obj)) {
-                                $this->collSmsCallLogs->append($obj);
-                            }
-                        }
-
-                        $this->collSmsCallLogsPartial = true;
-                    }
-
-                    return $collSmsCallLogs;
-                }
-
-                if ($partial && $this->collSmsCallLogs) {
-                    foreach ($this->collSmsCallLogs as $obj) {
-                        if ($obj->isNew()) {
-                            $collSmsCallLogs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collSmsCallLogs = $collSmsCallLogs;
-                $this->collSmsCallLogsPartial = false;
-            }
-        }
-
-        return $this->collSmsCallLogs;
-    }
-
-    /**
-     * Sets a collection of ChildSmsCallLog objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $smsCallLogs A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildStudent The current object (for fluent API support)
-     */
-    public function setSmsCallLogs(Collection $smsCallLogs, ConnectionInterface $con = null)
-    {
-        /** @var ChildSmsCallLog[] $smsCallLogsToDelete */
-        $smsCallLogsToDelete = $this->getSmsCallLogs(new Criteria(), $con)->diff($smsCallLogs);
-
-
-        $this->smsCallLogsScheduledForDeletion = $smsCallLogsToDelete;
-
-        foreach ($smsCallLogsToDelete as $smsCallLogRemoved) {
-            $smsCallLogRemoved->setStudent(null);
-        }
-
-        $this->collSmsCallLogs = null;
-        foreach ($smsCallLogs as $smsCallLog) {
-            $this->addSmsCallLog($smsCallLog);
-        }
-
-        $this->collSmsCallLogs = $smsCallLogs;
-        $this->collSmsCallLogsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related SmsCallLog objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related SmsCallLog objects.
-     * @throws PropelException
-     */
-    public function countSmsCallLogs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getSmsCallLogs());
-            }
-
-            $query = ChildSmsCallLogQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByStudent($this)
-                ->count($con);
-        }
-
-        return count($this->collSmsCallLogs);
-    }
-
-    /**
-     * Method called to associate a ChildSmsCallLog object to this object
-     * through the ChildSmsCallLog foreign key attribute.
-     *
-     * @param  ChildSmsCallLog $l ChildSmsCallLog
-     * @return $this|\App\Models\Student The current object (for fluent API support)
-     */
-    public function addSmsCallLog(ChildSmsCallLog $l)
-    {
-        if ($this->collSmsCallLogs === null) {
-            $this->initSmsCallLogs();
-            $this->collSmsCallLogsPartial = true;
-        }
-
-        if (!$this->collSmsCallLogs->contains($l)) {
-            $this->doAddSmsCallLog($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to add.
-     */
-    protected function doAddSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        $this->collSmsCallLogs[]= $smsCallLog;
-        $smsCallLog->setStudent($this);
-    }
-
-    /**
-     * @param  ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to remove.
-     * @return $this|ChildStudent The current object (for fluent API support)
-     */
-    public function removeSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        if ($this->getSmsCallLogs()->contains($smsCallLog)) {
-            $pos = $this->collSmsCallLogs->search($smsCallLog);
-            $this->collSmsCallLogs->remove($pos);
-            if (null === $this->smsCallLogsScheduledForDeletion) {
-                $this->smsCallLogsScheduledForDeletion = clone $this->collSmsCallLogs;
-                $this->smsCallLogsScheduledForDeletion->clear();
-            }
-            $this->smsCallLogsScheduledForDeletion[]= clone $smsCallLog;
-            $smsCallLog->setStudent(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Student is new, it will return
-     * an empty collection; or if this Student has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Student.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinApplicationRequest(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('ApplicationRequest', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Student is new, it will return
-     * an empty collection; or if this Student has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Student.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinPeriod(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Period', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Student is new, it will return
-     * an empty collection; or if this Student has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Student.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinSubject(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Subject', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -2922,13 +2470,11 @@ abstract class Student implements ActiveRecordInterface
         $this->last_name = null;
         $this->birth_place = null;
         $this->birthday = null;
-        $this->account_amount = null;
         $this->phone_number = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2955,16 +2501,10 @@ abstract class Student implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collSmsCallLogs) {
-                foreach ($this->collSmsCallLogs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
         $this->collAdminUsers = null;
         $this->collApplications = null;
-        $this->collSmsCallLogs = null;
         $this->aCourse = null;
         $this->aSchoolYear = null;
     }

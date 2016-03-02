@@ -44,7 +44,7 @@ class CourseList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->courses = CourseQuery::create();
+		$this->courses = CourseQuery::create()->orderByName();
         if(isset($array['Name']) && $array['Name'] !== "") $this->courses->where("course.name like '%".$array['Name']."%'");
         
 		if($search) session(['course_filter' => $array]);

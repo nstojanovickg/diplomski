@@ -45,7 +45,7 @@ class SubjectList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->subjects = SubjectQuery::create();
+		$this->subjects = SubjectQuery::create()->orderByCode();
         if(isset($array['Name']) && $array['Name'] !== "") $this->subjects->where("subject.name like '%".$array['Name']."%'");
 		if(isset($array['Code']) && $array['Code'] !== "") $this->subjects->where("subject.code like '%".$array['Code']."%'");
 		

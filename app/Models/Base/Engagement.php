@@ -1297,7 +1297,6 @@ abstract class Engagement implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildEngagementQuery::create();
-        $criteria->add(EngagementTableMap::COL_PROFESSOR_ID, $this->professor_id);
         $criteria->add(EngagementTableMap::COL_SUBJECT_ID, $this->subject_id);
         $criteria->add(EngagementTableMap::COL_COURSE_ID, $this->course_id);
         $criteria->add(EngagementTableMap::COL_SCHOOL_YEAR_ID, $this->school_year_id);
@@ -1313,23 +1312,15 @@ abstract class Engagement implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getProfessorId() &&
-            null !== $this->getSubjectId() &&
+        $validPk = null !== $this->getSubjectId() &&
             null !== $this->getCourseId() &&
             null !== $this->getSchoolYearId();
 
-        $validPrimaryKeyFKs = 4;
+        $validPrimaryKeyFKs = 3;
         $primaryKeyFKs = [];
 
         //relation fk_en_co to table course
         if ($this->aCourse && $hash = spl_object_hash($this->aCourse)) {
-            $primaryKeyFKs[] = $hash;
-        } else {
-            $validPrimaryKeyFKs = false;
-        }
-
-        //relation fk_en_pf to table professor
-        if ($this->aProfessor && $hash = spl_object_hash($this->aProfessor)) {
             $primaryKeyFKs[] = $hash;
         } else {
             $validPrimaryKeyFKs = false;
@@ -1366,10 +1357,9 @@ abstract class Engagement implements ActiveRecordInterface
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getProfessorId();
-        $pks[1] = $this->getSubjectId();
-        $pks[2] = $this->getCourseId();
-        $pks[3] = $this->getSchoolYearId();
+        $pks[0] = $this->getSubjectId();
+        $pks[1] = $this->getCourseId();
+        $pks[2] = $this->getSchoolYearId();
 
         return $pks;
     }
@@ -1382,10 +1372,9 @@ abstract class Engagement implements ActiveRecordInterface
      */
     public function setPrimaryKey($keys)
     {
-        $this->setProfessorId($keys[0]);
-        $this->setSubjectId($keys[1]);
-        $this->setCourseId($keys[2]);
-        $this->setSchoolYearId($keys[3]);
+        $this->setSubjectId($keys[0]);
+        $this->setCourseId($keys[1]);
+        $this->setSchoolYearId($keys[2]);
     }
 
     /**
@@ -1394,7 +1383,7 @@ abstract class Engagement implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return (null === $this->getProfessorId()) && (null === $this->getSubjectId()) && (null === $this->getCourseId()) && (null === $this->getSchoolYearId());
+        return (null === $this->getSubjectId()) && (null === $this->getCourseId()) && (null === $this->getSchoolYearId());
     }
 
     /**

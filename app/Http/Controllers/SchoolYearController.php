@@ -25,13 +25,13 @@ class SchoolYearController extends Controller {
 		$data_arr = $schoolYearList->getDataArr();
 		$paginationForm = $schoolYearList->getPaginationForm();
 		$filter = session('course_filter');
+		session(['attribute' => \Lang::get('general.SCHOOL_YEAR_OBJ')]);
 		
-		session(['attribute' => \Lang::get('general.SCHOOL_YEARS')]);
-		session(['attribute' => \Lang::get('general.SCHOOL_YEAR')]);
 		$form_filter = $formBuilder->create('App\Filters\SchoolYearFilter', [
 			'method' => 'PATCH',
 			'action' => ['SchoolYearController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
         
 		return view('list', [
@@ -40,7 +40,7 @@ class SchoolYearController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'SCHOOL_YEAR',
+								'title' => 'SCHOOL_YEARS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -63,10 +63,10 @@ class SchoolYearController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'SCHOOL_YEAR';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.SCHOOL_YEAR')]);
+		session(['attribute' => \Lang::get('general.SCHOOL_YEAR_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -118,9 +118,9 @@ class SchoolYearController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'SCHOOL_YEAR';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
-		session(['attribute' => \Lang::get('general.SCHOOL_YEAR')]);
+		session(['attribute' => \Lang::get('general.SCHOOL_YEAR_OBJ')]);
         
 		return view('manage', compact('form', 'form_name', 'action', 'path'));
 	}

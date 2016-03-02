@@ -172,13 +172,6 @@ class SubjectTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, 'Engagements', false);
-        $this->addRelation('SmsCallLog', '\\App\\Models\\SmsCallLog', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':subject_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'SmsCallLogs', false);
         $this->addRelation('StudyProgram', '\\App\\Models\\StudyProgram', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -209,7 +202,6 @@ class SubjectTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ApplicationTableMap::clearInstancePool();
         EngagementTableMap::clearInstancePool();
-        SmsCallLogTableMap::clearInstancePool();
         StudyProgramTableMap::clearInstancePool();
     }
 

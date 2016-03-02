@@ -30,14 +30,14 @@ class AdminUserController extends Controller {
 		$data_arr = $adminUserList->getDataArr();
 		$paginationForm = $adminUserList->getPaginationForm();
 		$filter = session('admin_user_filter');
+		session(['attribute' => \Lang::get('general.USER_OBJ')]);
 	    
 	    $form_filter = $formBuilder->create('App\Filters\AdminUserFilter', [
 			'method' => 'PATCH',
 			'action' => ['AdminUserController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		session(['attributes' => \Lang::get('general.USERS')]);
-		session(['attribute' => \Lang::get('general.USER')]);
 		
 	    return view('list', [
 								'controller' => 'AdminUserController',
@@ -45,7 +45,7 @@ class AdminUserController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'USER',
+								'title' => 'USERS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => false,
@@ -115,10 +115,10 @@ class AdminUserController extends Controller {
 		]);
 		
 		$form_name = 'USER';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.USER')]);
+		session(['attribute' => \Lang::get('general.USER_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -153,9 +153,9 @@ class AdminUserController extends Controller {
 					$adminUserCredential->setAdminUserId($id);
 					$adminUserCredential->setAdminCredentialId($credential_id);
 				}
-				//$adminUserCredential->setPermRead(0);
-				//$adminUserCredential->setPermWrite(0);
-				//$adminUserCredential->setPermExec(0);
+				$adminUserCredential->setPermRead(0);
+				$adminUserCredential->setPermWrite(0);
+				$adminUserCredential->setPermExec(0);
 				foreach($credentials_arr[$credential_id] as $perm){
 					if($perm == 'read') $adminUserCredential->setPermRead(1);
 					elseif($perm == 'write') $adminUserCredential->setPermWrite(1);

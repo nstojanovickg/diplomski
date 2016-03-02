@@ -1,6 +1,8 @@
 <?php
 
-use Base\ApplicationRequestQuery as BaseApplicationRequestQuery;
+namespace App\Models;
+
+use App\Models\Base\ApplicationRequestQuery as BaseApplicationRequestQuery;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'application_request' table.

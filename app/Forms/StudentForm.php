@@ -8,32 +8,17 @@ class StudentForm extends Form
 {
     public function buildForm()
     {
-        $shoolYears = SchoolYearQuery::create()->orderByYear()->find();
-        $shoolYears_arr = array('' => '');
-        foreach($shoolYears as $shoolYear){
-            $name = $shoolYear->__toString();
-            $id = $shoolYear->getId();
-            $shoolYears_arr[$id] = $name;
-        }
-        $courses = CourseQuery::create()->find();
-        $courses_arr = array('' => '');
-        foreach($courses as $course){
-            $name = $course->getName();
-            $id = $course->getId();
-            $courses_arr[$id] = $name;
-        }
-        
         $this
             ->add('IdentificationNumber', 'number')
             ->add('IdentificationNumberOrig', 'hidden')
             ->add('SchoolYearId', 'select',[
                 'label' => 'School Year',
-                'choices' => $shoolYears_arr
+                'choices' => $this->getSchoolYears()
             ])
             ->add('SchoolYearIdOrig', 'hidden')
             ->add('CourseId', 'select',[
                 'label' => 'Course',
-                'choices' => $courses_arr
+                'choices' => $this->getCourses()
             ])
             ->add('FirstName', 'text', [
                 'label' => 'First Name',
@@ -47,11 +32,30 @@ class StudentForm extends Form
             ->add('Birthday', 'datepicker',[
                 'date' => true
             ])
-            ->add('AccountAmount', 'number',[
-                'label' => 'Account Amount',
-            ])
             ->add('PhoneNumber', 'text', [
                 'label' => 'Phone Number',
             ]);
+    }
+    
+    private function getCourses() {
+        $courses = CourseQuery::create()->orderByName()->find();
+        $courses_arr = [];
+        foreach($courses as $course){
+            $name = $course->getName();
+            $id = $course->getId();
+            $courses_arr[$id] = $name;
+        }
+        return $courses_arr;
+    }
+    
+    private function getSchoolYears() {
+        $schoolYears = SchoolYearQuery::create()->orderByYear('desc')->find();
+        $schoolYears_arr = [];
+        foreach($schoolYears as $schoolYear){
+            $name = $schoolYear->__toString();
+            $id = $schoolYear->getId();
+            $schoolYears_arr[$id] = $name;
+        }
+        return $schoolYears_arr;
     }
 }

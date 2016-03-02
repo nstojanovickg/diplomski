@@ -16,5 +16,7 @@ use App\Models\Base\SubjectQuery as BaseSubjectQuery;
  */
 class SubjectQuery extends BaseSubjectQuery
 {
-
+    public static function retrieveByCode($code){
+        return self::create()->where('Subject.code = ?', $code)->findOne();
+    }
 }

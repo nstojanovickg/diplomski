@@ -26,15 +26,14 @@ class PeriodController extends Controller {
 		$data_arr = $periodList->getDataArr();
 		$paginationForm = $periodList->getPaginationForm();
 		$filter = session('period_filter');
+		session(['attribute' => \Lang::get('general.PERIOD')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\PeriodFilter', [
 			'method' => 'PATCH',
 			'action' => ['PeriodController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		
-		session(['attribute' => \Lang::get('general.PERIODS')]);
-		session(['attribute' => \Lang::get('general.PERIOD')]);
         
 		return view('list', [
 								'controller' => 'PeriodController',
@@ -42,7 +41,7 @@ class PeriodController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'PERIOD',
+								'title' => 'PERIODS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -65,7 +64,7 @@ class PeriodController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'PERIOD';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.PERIOD')]);
@@ -122,7 +121,7 @@ class PeriodController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'PERIOD';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		session(['attribute' => \Lang::get('general.PERIOD')]);
         

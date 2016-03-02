@@ -16,5 +16,7 @@ use App\Models\Base\StudentQuery as BaseStudentQuery;
  */
 class StudentQuery extends BaseStudentQuery
 {
-
+    public static function retrieveByPhoneNumber($phone_number){
+        return self::create()->where('Student.phone_number = ?', $phone_number)->findOne();
+    }
 }

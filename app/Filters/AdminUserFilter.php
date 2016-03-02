@@ -27,39 +27,18 @@ class AdminUserFilter extends Form
             $credentials[$id] = $name;
         }
         $this
-            ->add('Name', 'text',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ])
-            ->add('Login', 'text',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ])
-            ->add('Email', 'email',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ])
+            ->add('Name', 'text')
+            ->add('Login', 'text')
+            ->add('Email', 'email')
             ->add('Status', 'select', [
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
                 'choices' => ['' => '', 'NEW' => 'NEW','admin' => 'admin','professor' => 'professor', 'student' => 'student'],
             ])
             ->add('LanguageId', 'select', [
                 'label' => 'Default Language',
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
                 'choices' => $languages
             ])
             ->add('CredentialId', 'select',[
                 'label' => 'Credential',
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
                 'choices' => $credentials
             ]);
     }

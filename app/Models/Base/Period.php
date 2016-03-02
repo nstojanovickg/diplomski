@@ -11,8 +11,6 @@ use App\Models\Period as ChildPeriod;
 use App\Models\PeriodQuery as ChildPeriodQuery;
 use App\Models\PeriodSchoolYear as ChildPeriodSchoolYear;
 use App\Models\PeriodSchoolYearQuery as ChildPeriodSchoolYearQuery;
-use App\Models\SmsCallLog as ChildSmsCallLog;
-use App\Models\SmsCallLogQuery as ChildSmsCallLogQuery;
 use App\Models\Map\PeriodTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -82,6 +80,12 @@ abstract class Period implements ActiveRecordInterface
     protected $name;
 
     /**
+     * The value for the sequence field.
+     * @var        int
+     */
+    protected $sequence;
+
+    /**
      * The value for the created_at field.
      * @var        \DateTime
      */
@@ -106,12 +110,6 @@ abstract class Period implements ActiveRecordInterface
     protected $collPeriodSchoolYearsPartial;
 
     /**
-     * @var        ObjectCollection|ChildSmsCallLog[] Collection to store aggregation of ChildSmsCallLog objects.
-     */
-    protected $collSmsCallLogs;
-    protected $collSmsCallLogsPartial;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -130,12 +128,6 @@ abstract class Period implements ActiveRecordInterface
      * @var ObjectCollection|ChildPeriodSchoolYear[]
      */
     protected $periodSchoolYearsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildSmsCallLog[]
-     */
-    protected $smsCallLogsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of App\Models\Base\Period object.
@@ -375,6 +367,16 @@ abstract class Period implements ActiveRecordInterface
     }
 
     /**
+     * Get the [sequence] column value.
+     *
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -453,6 +455,26 @@ abstract class Period implements ActiveRecordInterface
 
         return $this;
     } // setName()
+
+    /**
+     * Set the value of [sequence] column.
+     *
+     * @param int $v new value
+     * @return $this|\App\Models\Period The current object (for fluent API support)
+     */
+    public function setSequence($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->sequence !== $v) {
+            $this->sequence = $v;
+            $this->modifiedColumns[PeriodTableMap::COL_SEQUENCE] = true;
+        }
+
+        return $this;
+    } // setSequence()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -536,13 +558,16 @@ abstract class Period implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : PeriodTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : PeriodTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : PeriodTableMap::translateFieldName('Sequence', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sequence = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : PeriodTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : PeriodTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : PeriodTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -555,7 +580,7 @@ abstract class Period implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = PeriodTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = PeriodTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\App\\Models\\Period'), 0, $e);
@@ -619,8 +644,6 @@ abstract class Period implements ActiveRecordInterface
             $this->collApplications = null;
 
             $this->collPeriodSchoolYears = null;
-
-            $this->collSmsCallLogs = null;
 
         } // if (deep)
     }
@@ -778,23 +801,6 @@ abstract class Period implements ActiveRecordInterface
                 }
             }
 
-            if ($this->smsCallLogsScheduledForDeletion !== null) {
-                if (!$this->smsCallLogsScheduledForDeletion->isEmpty()) {
-                    \App\Models\SmsCallLogQuery::create()
-                        ->filterByPrimaryKeys($this->smsCallLogsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->smsCallLogsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collSmsCallLogs !== null) {
-                foreach ($this->collSmsCallLogs as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             $this->alreadyInSave = false;
 
         }
@@ -827,6 +833,9 @@ abstract class Period implements ActiveRecordInterface
         if ($this->isColumnModified(PeriodTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
+        if ($this->isColumnModified(PeriodTableMap::COL_SEQUENCE)) {
+            $modifiedColumns[':p' . $index++]  = 'sequence';
+        }
         if ($this->isColumnModified(PeriodTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -849,6 +858,9 @@ abstract class Period implements ActiveRecordInterface
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case 'sequence':
+                        $stmt->bindValue($identifier, $this->sequence, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -925,9 +937,12 @@ abstract class Period implements ActiveRecordInterface
                 return $this->getName();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getSequence();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -962,21 +977,22 @@ abstract class Period implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getSequence(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
 
         $utc = new \DateTimeZone('utc');
-        if ($result[$keys[2]] instanceof \DateTime) {
-            // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[2]];
-            $result[$keys[2]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
-        }
-
         if ($result[$keys[3]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
             $dateTime = clone $result[$keys[3]];
             $result[$keys[3]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+        }
+
+        if ($result[$keys[4]] instanceof \DateTime) {
+            // When changing timezone we don't want to change existing instances
+            $dateTime = clone $result[$keys[4]];
+            $result[$keys[4]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1014,21 +1030,6 @@ abstract class Period implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collPeriodSchoolYears->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collSmsCallLogs) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'smsCallLogs';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'sms_call_logs';
-                        break;
-                    default:
-                        $key = 'SmsCallLogs';
-                }
-
-                $result[$key] = $this->collSmsCallLogs->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1071,9 +1072,12 @@ abstract class Period implements ActiveRecordInterface
                 $this->setName($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setSequence($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1109,10 +1113,13 @@ abstract class Period implements ActiveRecordInterface
             $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setCreatedAt($arr[$keys[2]]);
+            $this->setSequence($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setUpdatedAt($arr[$keys[3]]);
+            $this->setCreatedAt($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setUpdatedAt($arr[$keys[4]]);
         }
     }
 
@@ -1160,6 +1167,9 @@ abstract class Period implements ActiveRecordInterface
         }
         if ($this->isColumnModified(PeriodTableMap::COL_NAME)) {
             $criteria->add(PeriodTableMap::COL_NAME, $this->name);
+        }
+        if ($this->isColumnModified(PeriodTableMap::COL_SEQUENCE)) {
+            $criteria->add(PeriodTableMap::COL_SEQUENCE, $this->sequence);
         }
         if ($this->isColumnModified(PeriodTableMap::COL_CREATED_AT)) {
             $criteria->add(PeriodTableMap::COL_CREATED_AT, $this->created_at);
@@ -1254,6 +1264,7 @@ abstract class Period implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+        $copyObj->setSequence($this->getSequence());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1271,12 +1282,6 @@ abstract class Period implements ActiveRecordInterface
             foreach ($this->getPeriodSchoolYears() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addPeriodSchoolYear($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getSmsCallLogs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addSmsCallLog($relObj->copy($deepCopy));
                 }
             }
 
@@ -1326,9 +1331,6 @@ abstract class Period implements ActiveRecordInterface
         }
         if ('PeriodSchoolYear' == $relationName) {
             return $this->initPeriodSchoolYears();
-        }
-        if ('SmsCallLog' == $relationName) {
-            return $this->initSmsCallLogs();
         }
     }
 
@@ -1548,31 +1550,6 @@ abstract class Period implements ActiveRecordInterface
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Period is new, it will return
-     * an empty collection; or if this Period has previously
-     * been saved, it will retrieve related Applications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Period.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildApplication[] List of ChildApplication objects
-     */
-    public function getApplicationsJoinOralExamInvitation(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildApplicationQuery::create(null, $criteria);
-        $query->joinWith('OralExamInvitation', $joinBehavior);
-
-        return $this->getApplications($query, $con);
     }
 
 
@@ -1897,299 +1874,6 @@ abstract class Period implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collSmsCallLogs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addSmsCallLogs()
-     */
-    public function clearSmsCallLogs()
-    {
-        $this->collSmsCallLogs = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collSmsCallLogs collection loaded partially.
-     */
-    public function resetPartialSmsCallLogs($v = true)
-    {
-        $this->collSmsCallLogsPartial = $v;
-    }
-
-    /**
-     * Initializes the collSmsCallLogs collection.
-     *
-     * By default this just sets the collSmsCallLogs collection to an empty array (like clearcollSmsCallLogs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initSmsCallLogs($overrideExisting = true)
-    {
-        if (null !== $this->collSmsCallLogs && !$overrideExisting) {
-            return;
-        }
-        $this->collSmsCallLogs = new ObjectCollection();
-        $this->collSmsCallLogs->setModel('\App\Models\SmsCallLog');
-    }
-
-    /**
-     * Gets an array of ChildSmsCallLog objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildPeriod is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     * @throws PropelException
-     */
-    public function getSmsCallLogs(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                // return empty collection
-                $this->initSmsCallLogs();
-            } else {
-                $collSmsCallLogs = ChildSmsCallLogQuery::create(null, $criteria)
-                    ->filterByPeriod($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collSmsCallLogsPartial && count($collSmsCallLogs)) {
-                        $this->initSmsCallLogs(false);
-
-                        foreach ($collSmsCallLogs as $obj) {
-                            if (false == $this->collSmsCallLogs->contains($obj)) {
-                                $this->collSmsCallLogs->append($obj);
-                            }
-                        }
-
-                        $this->collSmsCallLogsPartial = true;
-                    }
-
-                    return $collSmsCallLogs;
-                }
-
-                if ($partial && $this->collSmsCallLogs) {
-                    foreach ($this->collSmsCallLogs as $obj) {
-                        if ($obj->isNew()) {
-                            $collSmsCallLogs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collSmsCallLogs = $collSmsCallLogs;
-                $this->collSmsCallLogsPartial = false;
-            }
-        }
-
-        return $this->collSmsCallLogs;
-    }
-
-    /**
-     * Sets a collection of ChildSmsCallLog objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $smsCallLogs A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildPeriod The current object (for fluent API support)
-     */
-    public function setSmsCallLogs(Collection $smsCallLogs, ConnectionInterface $con = null)
-    {
-        /** @var ChildSmsCallLog[] $smsCallLogsToDelete */
-        $smsCallLogsToDelete = $this->getSmsCallLogs(new Criteria(), $con)->diff($smsCallLogs);
-
-
-        $this->smsCallLogsScheduledForDeletion = $smsCallLogsToDelete;
-
-        foreach ($smsCallLogsToDelete as $smsCallLogRemoved) {
-            $smsCallLogRemoved->setPeriod(null);
-        }
-
-        $this->collSmsCallLogs = null;
-        foreach ($smsCallLogs as $smsCallLog) {
-            $this->addSmsCallLog($smsCallLog);
-        }
-
-        $this->collSmsCallLogs = $smsCallLogs;
-        $this->collSmsCallLogsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related SmsCallLog objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related SmsCallLog objects.
-     * @throws PropelException
-     */
-    public function countSmsCallLogs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getSmsCallLogs());
-            }
-
-            $query = ChildSmsCallLogQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPeriod($this)
-                ->count($con);
-        }
-
-        return count($this->collSmsCallLogs);
-    }
-
-    /**
-     * Method called to associate a ChildSmsCallLog object to this object
-     * through the ChildSmsCallLog foreign key attribute.
-     *
-     * @param  ChildSmsCallLog $l ChildSmsCallLog
-     * @return $this|\App\Models\Period The current object (for fluent API support)
-     */
-    public function addSmsCallLog(ChildSmsCallLog $l)
-    {
-        if ($this->collSmsCallLogs === null) {
-            $this->initSmsCallLogs();
-            $this->collSmsCallLogsPartial = true;
-        }
-
-        if (!$this->collSmsCallLogs->contains($l)) {
-            $this->doAddSmsCallLog($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to add.
-     */
-    protected function doAddSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        $this->collSmsCallLogs[]= $smsCallLog;
-        $smsCallLog->setPeriod($this);
-    }
-
-    /**
-     * @param  ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to remove.
-     * @return $this|ChildPeriod The current object (for fluent API support)
-     */
-    public function removeSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        if ($this->getSmsCallLogs()->contains($smsCallLog)) {
-            $pos = $this->collSmsCallLogs->search($smsCallLog);
-            $this->collSmsCallLogs->remove($pos);
-            if (null === $this->smsCallLogsScheduledForDeletion) {
-                $this->smsCallLogsScheduledForDeletion = clone $this->collSmsCallLogs;
-                $this->smsCallLogsScheduledForDeletion->clear();
-            }
-            $this->smsCallLogsScheduledForDeletion[]= clone $smsCallLog;
-            $smsCallLog->setPeriod(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Period is new, it will return
-     * an empty collection; or if this Period has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Period.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinApplicationRequest(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('ApplicationRequest', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Period is new, it will return
-     * an empty collection; or if this Period has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Period.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinSubject(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Subject', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Period is new, it will return
-     * an empty collection; or if this Period has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Period.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinStudent(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Student', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -2198,6 +1882,7 @@ abstract class Period implements ActiveRecordInterface
     {
         $this->id = null;
         $this->name = null;
+        $this->sequence = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2228,16 +1913,10 @@ abstract class Period implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collSmsCallLogs) {
-                foreach ($this->collSmsCallLogs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
         $this->collApplications = null;
         $this->collPeriodSchoolYears = null;
-        $this->collSmsCallLogs = null;
     }
 
     /**

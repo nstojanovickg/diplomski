@@ -8,14 +8,10 @@ class ProfessorFilter extends Form
     {
         $this
             ->add('FirstName', 'text', [
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
+                'label' => 'First Name'
             ])
-            ->add('LasName', 'text', [
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
+            ->add('LastName', 'text', [
+                'label' => 'Last Name'
             ]);
     }
 }

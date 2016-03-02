@@ -59,7 +59,7 @@ class PeriodTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class PeriodTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -80,6 +80,11 @@ class PeriodTableMap extends TableMap
      * the column name for the name field
      */
     const COL_NAME = 'period.name';
+
+    /**
+     * the column name for the sequence field
+     */
+    const COL_SEQUENCE = 'period.sequence';
 
     /**
      * the column name for the created_at field
@@ -103,11 +108,11 @@ class PeriodTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(PeriodTableMap::COL_ID, PeriodTableMap::COL_NAME, PeriodTableMap::COL_CREATED_AT, PeriodTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Sequence', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'sequence', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(PeriodTableMap::COL_ID, PeriodTableMap::COL_NAME, PeriodTableMap::COL_SEQUENCE, PeriodTableMap::COL_CREATED_AT, PeriodTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'sequence', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -117,11 +122,11 @@ class PeriodTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(PeriodTableMap::COL_ID => 0, PeriodTableMap::COL_NAME => 1, PeriodTableMap::COL_CREATED_AT => 2, PeriodTableMap::COL_UPDATED_AT => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Sequence' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'sequence' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(PeriodTableMap::COL_ID => 0, PeriodTableMap::COL_NAME => 1, PeriodTableMap::COL_SEQUENCE => 2, PeriodTableMap::COL_CREATED_AT => 3, PeriodTableMap::COL_UPDATED_AT => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'sequence' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -143,6 +148,7 @@ class PeriodTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
+        $this->addColumn('sequence', 'Sequence', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -166,13 +172,6 @@ class PeriodTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, 'PeriodSchoolYears', false);
-        $this->addRelation('SmsCallLog', '\\App\\Models\\SmsCallLog', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':period_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'SmsCallLogs', false);
     } // buildRelations()
 
     /**
@@ -196,7 +195,6 @@ class PeriodTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ApplicationTableMap::clearInstancePool();
         PeriodSchoolYearTableMap::clearInstancePool();
-        SmsCallLogTableMap::clearInstancePool();
     }
 
     /**
@@ -342,11 +340,13 @@ class PeriodTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(PeriodTableMap::COL_ID);
             $criteria->addSelectColumn(PeriodTableMap::COL_NAME);
+            $criteria->addSelectColumn(PeriodTableMap::COL_SEQUENCE);
             $criteria->addSelectColumn(PeriodTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(PeriodTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.sequence');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

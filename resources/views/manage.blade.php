@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', Lang::get('general.'.$action) ." ". Lang::get('general.'.$form_name).' ')
+@section('title', Lang::get('general.'.$action, ['attribute' => Session::get('attribute')])." ")
 
 @section('content')
 <h1>{{ Lang::get('general.'.$action, ['attribute' => Session::get('attribute')]) }}</h1>

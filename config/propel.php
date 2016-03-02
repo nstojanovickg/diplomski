@@ -264,7 +264,7 @@ return [
                 # To have these methods return DateTime objects instead, you should set these
                 # to empty values
                 'defaultTimeStampFormat' => 'Y-m-d H:i:s',
-                'defaultTimeFormat' => '%X',
+                'defaultTimeFormat' => 'H:i:s',
                 'defaultDateFormat' => 'Y-m-d',
             ],
             'objectModel' => [

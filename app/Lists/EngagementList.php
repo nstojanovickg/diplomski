@@ -32,9 +32,9 @@ class EngagementList extends BaseList {
 		$this->setPaginationForm($cnt, $page, $path);
 		
 	    foreach($this->objects->paginate($page, $this->maxPerPage) as $key => $object){
-			$id = $object->getProfessorId().'/'.$object->getSubjectId().'/'.$object->getCourseId().'/'.$object->getSchoolYearId();
+			$id = $object->getSubjectId().'/'.$object->getCourseId().'/'.$object->getSchoolYearId();
 			$this->data_arr[$id]['#'] = ($page - 1) * $this->maxPerPage + $key+1;
-			$this->data_arr[$id]['professor'] = $object->getProfessor()->__toString();
+			$this->data_arr[$id]['professor'] = $object->getProfessor()->toString();
             $this->data_arr[$id]['subject'] = $object->getSubject()->__toString();
             $this->data_arr[$id]['course'] = $object->getCourse()->__toString();
 			$this->data_arr[$id]['school_year_id'] = $object->getSchoolYear()->__toString();
@@ -46,7 +46,16 @@ class EngagementList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = EngagementQuery::create();
+		$this->objects = EngagementQuery::create()
+			->useSchoolYearQuery()
+				->orderByYear('desc')
+			->endUse()
+			->useCourseQuery()
+				->orderByName()
+			->endUse()
+			->useSubjectQuery()
+				->orderByName()
+			->endUse();
 		if(\Auth::user()->getStatus() == 'professor'){
 			$professor_id = \Auth::user()->getProfessorId();
 			$this->objects->where("engagement.professor_id = ?",$professor_id);

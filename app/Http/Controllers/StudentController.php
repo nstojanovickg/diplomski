@@ -25,15 +25,14 @@ class StudentController extends Controller {
 		$data_arr = $studentList->getDataArr();
 		$paginationForm = $studentList->getPaginationForm();
 		$filter = session('student_filter');
+		session(['attribute' => \Lang::get('general.STUDENT_OBJ')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\StudentFilter', [
 			'method' => 'PATCH',
 			'action' => ['StudentController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		
-		session(['attribute' => \Lang::get('general.STUDENTS')]);
-		session(['attribute' => \Lang::get('general.STUDENT')]);
         
 		return view('list', [
 								'controller' => 'StudentController',
@@ -41,7 +40,7 @@ class StudentController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'STUDENT',
+								'title' => 'STUDENTS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -64,10 +63,10 @@ class StudentController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'STUDENT';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.STUDENT')]);
+		session(['attribute' => \Lang::get('general.STUDENT_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -121,9 +120,9 @@ class StudentController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'STUDENT';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
-		session(['attribute' => \Lang::get('general.STUDENT')]);
+		session(['attribute' => \Lang::get('general.STUDENT_OBJ')]);
         
 		return view('manage', compact('form', 'form_name', 'action', 'path'));
 	}

@@ -59,7 +59,7 @@ class StudentTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 11;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class StudentTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /**
      * the column name for the id field
@@ -112,11 +112,6 @@ class StudentTableMap extends TableMap
     const COL_BIRTHDAY = 'student.birthday';
 
     /**
-     * the column name for the account_amount field
-     */
-    const COL_ACCOUNT_AMOUNT = 'student.account_amount';
-
-    /**
      * the column name for the phone_number field
      */
     const COL_PHONE_NUMBER = 'student.phone_number';
@@ -143,11 +138,11 @@ class StudentTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'IdentificationNumber', 'SchoolYearId', 'CourseId', 'FirstName', 'LastName', 'BirthPlace', 'Birthday', 'AccountAmount', 'PhoneNumber', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'identificationNumber', 'schoolYearId', 'courseId', 'firstName', 'lastName', 'birthPlace', 'birthday', 'accountAmount', 'phoneNumber', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(StudentTableMap::COL_ID, StudentTableMap::COL_IDENTIFICATION_NUMBER, StudentTableMap::COL_SCHOOL_YEAR_ID, StudentTableMap::COL_COURSE_ID, StudentTableMap::COL_FIRST_NAME, StudentTableMap::COL_LAST_NAME, StudentTableMap::COL_BIRTH_PLACE, StudentTableMap::COL_BIRTHDAY, StudentTableMap::COL_ACCOUNT_AMOUNT, StudentTableMap::COL_PHONE_NUMBER, StudentTableMap::COL_CREATED_AT, StudentTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'identification_number', 'school_year_id', 'course_id', 'first_name', 'last_name', 'birth_place', 'birthday', 'account_amount', 'phone_number', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id', 'IdentificationNumber', 'SchoolYearId', 'CourseId', 'FirstName', 'LastName', 'BirthPlace', 'Birthday', 'PhoneNumber', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'identificationNumber', 'schoolYearId', 'courseId', 'firstName', 'lastName', 'birthPlace', 'birthday', 'phoneNumber', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(StudentTableMap::COL_ID, StudentTableMap::COL_IDENTIFICATION_NUMBER, StudentTableMap::COL_SCHOOL_YEAR_ID, StudentTableMap::COL_COURSE_ID, StudentTableMap::COL_FIRST_NAME, StudentTableMap::COL_LAST_NAME, StudentTableMap::COL_BIRTH_PLACE, StudentTableMap::COL_BIRTHDAY, StudentTableMap::COL_PHONE_NUMBER, StudentTableMap::COL_CREATED_AT, StudentTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'identification_number', 'school_year_id', 'course_id', 'first_name', 'last_name', 'birth_place', 'birthday', 'phone_number', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -157,11 +152,11 @@ class StudentTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'IdentificationNumber' => 1, 'SchoolYearId' => 2, 'CourseId' => 3, 'FirstName' => 4, 'LastName' => 5, 'BirthPlace' => 6, 'Birthday' => 7, 'AccountAmount' => 8, 'PhoneNumber' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'identificationNumber' => 1, 'schoolYearId' => 2, 'courseId' => 3, 'firstName' => 4, 'lastName' => 5, 'birthPlace' => 6, 'birthday' => 7, 'accountAmount' => 8, 'phoneNumber' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(StudentTableMap::COL_ID => 0, StudentTableMap::COL_IDENTIFICATION_NUMBER => 1, StudentTableMap::COL_SCHOOL_YEAR_ID => 2, StudentTableMap::COL_COURSE_ID => 3, StudentTableMap::COL_FIRST_NAME => 4, StudentTableMap::COL_LAST_NAME => 5, StudentTableMap::COL_BIRTH_PLACE => 6, StudentTableMap::COL_BIRTHDAY => 7, StudentTableMap::COL_ACCOUNT_AMOUNT => 8, StudentTableMap::COL_PHONE_NUMBER => 9, StudentTableMap::COL_CREATED_AT => 10, StudentTableMap::COL_UPDATED_AT => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'identification_number' => 1, 'school_year_id' => 2, 'course_id' => 3, 'first_name' => 4, 'last_name' => 5, 'birth_place' => 6, 'birthday' => 7, 'account_amount' => 8, 'phone_number' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'IdentificationNumber' => 1, 'SchoolYearId' => 2, 'CourseId' => 3, 'FirstName' => 4, 'LastName' => 5, 'BirthPlace' => 6, 'Birthday' => 7, 'PhoneNumber' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'identificationNumber' => 1, 'schoolYearId' => 2, 'courseId' => 3, 'firstName' => 4, 'lastName' => 5, 'birthPlace' => 6, 'birthday' => 7, 'phoneNumber' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        self::TYPE_COLNAME       => array(StudentTableMap::COL_ID => 0, StudentTableMap::COL_IDENTIFICATION_NUMBER => 1, StudentTableMap::COL_SCHOOL_YEAR_ID => 2, StudentTableMap::COL_COURSE_ID => 3, StudentTableMap::COL_FIRST_NAME => 4, StudentTableMap::COL_LAST_NAME => 5, StudentTableMap::COL_BIRTH_PLACE => 6, StudentTableMap::COL_BIRTHDAY => 7, StudentTableMap::COL_PHONE_NUMBER => 8, StudentTableMap::COL_CREATED_AT => 9, StudentTableMap::COL_UPDATED_AT => 10, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'identification_number' => 1, 'school_year_id' => 2, 'course_id' => 3, 'first_name' => 4, 'last_name' => 5, 'birth_place' => 6, 'birthday' => 7, 'phone_number' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -189,8 +184,7 @@ class StudentTableMap extends TableMap
         $this->addColumn('last_name', 'LastName', 'VARCHAR', true, 100, null);
         $this->addColumn('birth_place', 'BirthPlace', 'VARCHAR', true, 100, null);
         $this->addColumn('birthday', 'Birthday', 'DATE', false, null, null);
-        $this->addColumn('account_amount', 'AccountAmount', 'FLOAT', false, 6, 0);
-        $this->addColumn('phone_number', 'PhoneNumber', 'VARCHAR', true, 20, null);
+        $this->addColumn('phone_number', 'PhoneNumber', 'VARCHAR', false, 20, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -228,13 +222,6 @@ class StudentTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, 'Applications', false);
-        $this->addRelation('SmsCallLog', '\\App\\Models\\SmsCallLog', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':student_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'SmsCallLogs', false);
     } // buildRelations()
 
     /**
@@ -258,7 +245,6 @@ class StudentTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AdminUserTableMap::clearInstancePool();
         ApplicationTableMap::clearInstancePool();
-        SmsCallLogTableMap::clearInstancePool();
     }
 
     /**
@@ -410,7 +396,6 @@ class StudentTableMap extends TableMap
             $criteria->addSelectColumn(StudentTableMap::COL_LAST_NAME);
             $criteria->addSelectColumn(StudentTableMap::COL_BIRTH_PLACE);
             $criteria->addSelectColumn(StudentTableMap::COL_BIRTHDAY);
-            $criteria->addSelectColumn(StudentTableMap::COL_ACCOUNT_AMOUNT);
             $criteria->addSelectColumn(StudentTableMap::COL_PHONE_NUMBER);
             $criteria->addSelectColumn(StudentTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(StudentTableMap::COL_UPDATED_AT);
@@ -423,7 +408,6 @@ class StudentTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.last_name');
             $criteria->addSelectColumn($alias . '.birth_place');
             $criteria->addSelectColumn($alias . '.birthday');
-            $criteria->addSelectColumn($alias . '.account_amount');
             $criteria->addSelectColumn($alias . '.phone_number');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');

@@ -25,8 +25,8 @@ class PeriodRequest extends Request {
 		return [
 			'PeriodId' => 'required',
 			'SchoolYearId' => 'required',
-			'DateStart' => 'date',
-			'DateEnd' => 'date'
+			'DateStart' => 'required|date',
+			'DateEnd' => 'required|date'
 		];
 	}
 	

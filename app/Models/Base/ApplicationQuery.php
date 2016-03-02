@@ -25,7 +25,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationQuery orderBySubjectId($order = Criteria::ASC) Order by the subject_id column
  * @method     ChildApplicationQuery orderByPeriodId($order = Criteria::ASC) Order by the period_id column
  * @method     ChildApplicationQuery orderBySchoolYearId($order = Criteria::ASC) Order by the school_year_id column
- * @method     ChildApplicationQuery orderByOralExamInvitationId($order = Criteria::ASC) Order by the oral_exam_invitation_id column
  * @method     ChildApplicationQuery orderByApplicationDate($order = Criteria::ASC) Order by the application_date column
  * @method     ChildApplicationQuery orderByExamDate($order = Criteria::ASC) Order by the exam_date column
  * @method     ChildApplicationQuery orderByExamTime($order = Criteria::ASC) Order by the exam_time column
@@ -38,7 +37,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationQuery groupBySubjectId() Group by the subject_id column
  * @method     ChildApplicationQuery groupByPeriodId() Group by the period_id column
  * @method     ChildApplicationQuery groupBySchoolYearId() Group by the school_year_id column
- * @method     ChildApplicationQuery groupByOralExamInvitationId() Group by the oral_exam_invitation_id column
  * @method     ChildApplicationQuery groupByApplicationDate() Group by the application_date column
  * @method     ChildApplicationQuery groupByExamDate() Group by the exam_date column
  * @method     ChildApplicationQuery groupByExamTime() Group by the exam_time column
@@ -49,10 +47,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildApplicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildApplicationQuery innerJoin($relation) Adds a INNER JOIN clause to the query
- *
- * @method     ChildApplicationQuery leftJoinOralExamInvitation($relationAlias = null) Adds a LEFT JOIN clause to the query using the OralExamInvitation relation
- * @method     ChildApplicationQuery rightJoinOralExamInvitation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OralExamInvitation relation
- * @method     ChildApplicationQuery innerJoinOralExamInvitation($relationAlias = null) Adds a INNER JOIN clause to the query using the OralExamInvitation relation
  *
  * @method     ChildApplicationQuery leftJoinPeriod($relationAlias = null) Adds a LEFT JOIN clause to the query using the Period relation
  * @method     ChildApplicationQuery rightJoinPeriod($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Period relation
@@ -70,7 +64,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationQuery rightJoinSchoolYear($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SchoolYear relation
  * @method     ChildApplicationQuery innerJoinSchoolYear($relationAlias = null) Adds a INNER JOIN clause to the query using the SchoolYear relation
  *
- * @method     \App\Models\OralExamInvitationQuery|\App\Models\PeriodQuery|\App\Models\SubjectQuery|\App\Models\StudentQuery|\App\Models\SchoolYearQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildApplicationQuery leftJoinApplicationRequest($relationAlias = null) Adds a LEFT JOIN clause to the query using the ApplicationRequest relation
+ * @method     ChildApplicationQuery rightJoinApplicationRequest($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ApplicationRequest relation
+ * @method     ChildApplicationQuery innerJoinApplicationRequest($relationAlias = null) Adds a INNER JOIN clause to the query using the ApplicationRequest relation
+ *
+ * @method     \App\Models\PeriodQuery|\App\Models\SubjectQuery|\App\Models\StudentQuery|\App\Models\SchoolYearQuery|\App\Models\ApplicationRequestQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildApplication findOne(ConnectionInterface $con = null) Return the first ChildApplication matching the query
  * @method     ChildApplication findOneOrCreate(ConnectionInterface $con = null) Return the first ChildApplication matching the query, or a new ChildApplication object populated from the query conditions when no match is found
@@ -80,7 +78,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplication findOneBySubjectId(int $subject_id) Return the first ChildApplication filtered by the subject_id column
  * @method     ChildApplication findOneByPeriodId(int $period_id) Return the first ChildApplication filtered by the period_id column
  * @method     ChildApplication findOneBySchoolYearId(int $school_year_id) Return the first ChildApplication filtered by the school_year_id column
- * @method     ChildApplication findOneByOralExamInvitationId(int $oral_exam_invitation_id) Return the first ChildApplication filtered by the oral_exam_invitation_id column
  * @method     ChildApplication findOneByApplicationDate(string $application_date) Return the first ChildApplication filtered by the application_date column
  * @method     ChildApplication findOneByExamDate(string $exam_date) Return the first ChildApplication filtered by the exam_date column
  * @method     ChildApplication findOneByExamTime(string $exam_time) Return the first ChildApplication filtered by the exam_time column
@@ -96,7 +93,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplication requireOneBySubjectId(int $subject_id) Return the first ChildApplication filtered by the subject_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplication requireOneByPeriodId(int $period_id) Return the first ChildApplication filtered by the period_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplication requireOneBySchoolYearId(int $school_year_id) Return the first ChildApplication filtered by the school_year_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildApplication requireOneByOralExamInvitationId(int $oral_exam_invitation_id) Return the first ChildApplication filtered by the oral_exam_invitation_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplication requireOneByApplicationDate(string $application_date) Return the first ChildApplication filtered by the application_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplication requireOneByExamDate(string $exam_date) Return the first ChildApplication filtered by the exam_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplication requireOneByExamTime(string $exam_time) Return the first ChildApplication filtered by the exam_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -110,7 +106,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplication[]|ObjectCollection findBySubjectId(int $subject_id) Return ChildApplication objects filtered by the subject_id column
  * @method     ChildApplication[]|ObjectCollection findByPeriodId(int $period_id) Return ChildApplication objects filtered by the period_id column
  * @method     ChildApplication[]|ObjectCollection findBySchoolYearId(int $school_year_id) Return ChildApplication objects filtered by the school_year_id column
- * @method     ChildApplication[]|ObjectCollection findByOralExamInvitationId(int $oral_exam_invitation_id) Return ChildApplication objects filtered by the oral_exam_invitation_id column
  * @method     ChildApplication[]|ObjectCollection findByApplicationDate(string $application_date) Return ChildApplication objects filtered by the application_date column
  * @method     ChildApplication[]|ObjectCollection findByExamDate(string $exam_date) Return ChildApplication objects filtered by the exam_date column
  * @method     ChildApplication[]|ObjectCollection findByExamTime(string $exam_time) Return ChildApplication objects filtered by the exam_time column
@@ -209,7 +204,7 @@ abstract class ApplicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, student_id, subject_id, period_id, school_year_id, oral_exam_invitation_id, application_date, exam_date, exam_time, exam_score, created_at, updated_at FROM application WHERE id = :p0';
+        $sql = 'SELECT id, student_id, subject_id, period_id, school_year_id, application_date, exam_date, exam_time, exam_score, created_at, updated_at FROM application WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -513,49 +508,6 @@ abstract class ApplicationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the oral_exam_invitation_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByOralExamInvitationId(1234); // WHERE oral_exam_invitation_id = 1234
-     * $query->filterByOralExamInvitationId(array(12, 34)); // WHERE oral_exam_invitation_id IN (12, 34)
-     * $query->filterByOralExamInvitationId(array('min' => 12)); // WHERE oral_exam_invitation_id > 12
-     * </code>
-     *
-     * @see       filterByOralExamInvitation()
-     *
-     * @param     mixed $oralExamInvitationId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildApplicationQuery The current query, for fluid interface
-     */
-    public function filterByOralExamInvitationId($oralExamInvitationId = null, $comparison = null)
-    {
-        if (is_array($oralExamInvitationId)) {
-            $useMinMax = false;
-            if (isset($oralExamInvitationId['min'])) {
-                $this->addUsingAlias(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $oralExamInvitationId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($oralExamInvitationId['max'])) {
-                $this->addUsingAlias(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $oralExamInvitationId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $oralExamInvitationId, $comparison);
-    }
-
-    /**
      * Filter the query on the application_date column
      *
      * Example usage:
@@ -809,83 +761,6 @@ abstract class ApplicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ApplicationTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
-    }
-
-    /**
-     * Filter the query by a related \App\Models\OralExamInvitation object
-     *
-     * @param \App\Models\OralExamInvitation|ObjectCollection $oralExamInvitation The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildApplicationQuery The current query, for fluid interface
-     */
-    public function filterByOralExamInvitation($oralExamInvitation, $comparison = null)
-    {
-        if ($oralExamInvitation instanceof \App\Models\OralExamInvitation) {
-            return $this
-                ->addUsingAlias(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $oralExamInvitation->getId(), $comparison);
-        } elseif ($oralExamInvitation instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, $oralExamInvitation->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByOralExamInvitation() only accepts arguments of type \App\Models\OralExamInvitation or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the OralExamInvitation relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildApplicationQuery The current query, for fluid interface
-     */
-    public function joinOralExamInvitation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OralExamInvitation');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'OralExamInvitation');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the OralExamInvitation relation OralExamInvitation object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \App\Models\OralExamInvitationQuery A secondary query class using the current class as primary query
-     */
-    public function useOralExamInvitationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinOralExamInvitation($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OralExamInvitation', '\App\Models\OralExamInvitationQuery');
     }
 
     /**
@@ -1194,6 +1069,79 @@ abstract class ApplicationQuery extends ModelCriteria
         return $this
             ->joinSchoolYear($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'SchoolYear', '\App\Models\SchoolYearQuery');
+    }
+
+    /**
+     * Filter the query by a related \App\Models\ApplicationRequest object
+     *
+     * @param \App\Models\ApplicationRequest|ObjectCollection $applicationRequest the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildApplicationQuery The current query, for fluid interface
+     */
+    public function filterByApplicationRequest($applicationRequest, $comparison = null)
+    {
+        if ($applicationRequest instanceof \App\Models\ApplicationRequest) {
+            return $this
+                ->addUsingAlias(ApplicationTableMap::COL_ID, $applicationRequest->getApplicationId(), $comparison);
+        } elseif ($applicationRequest instanceof ObjectCollection) {
+            return $this
+                ->useApplicationRequestQuery()
+                ->filterByPrimaryKeys($applicationRequest->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByApplicationRequest() only accepts arguments of type \App\Models\ApplicationRequest or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ApplicationRequest relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildApplicationQuery The current query, for fluid interface
+     */
+    public function joinApplicationRequest($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ApplicationRequest');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ApplicationRequest');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ApplicationRequest relation ApplicationRequest object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \App\Models\ApplicationRequestQuery A secondary query class using the current class as primary query
+     */
+    public function useApplicationRequestQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinApplicationRequest($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ApplicationRequest', '\App\Models\ApplicationRequestQuery');
     }
 
     /**

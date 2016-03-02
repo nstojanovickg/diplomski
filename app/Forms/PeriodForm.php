@@ -8,29 +8,15 @@ class PeriodForm extends Form
 {
     public function buildForm()
     {
-        $periods = PeriodQuery::create()->find();
-        $periods_arr = array('' => '');
-        foreach($periods as $period){
-            $name = $period->__toString();
-            $id = $period->getId();
-            $periods_arr[$id] = $name;
-        }
-        $shoolYears = SchoolYearQuery::create()->orderByYear()->find();
-        $shoolYears_arr = array('' => '');
-        foreach($shoolYears as $shoolYear){
-            $name = $shoolYear->__toString();
-            $id = $shoolYear->getId();
-            $shoolYears_arr[$id] = $name;
-        }
         $this
             ->add('PeriodId', 'select', [
                 'label' => 'Period',
-                'choices' => $periods_arr
+                'choices' => $this->getPeriods()
             ])
             ->add('PeriodIdOrig', 'hidden')
             ->add('SchoolYearId', 'select', [
                 'label' => 'School Year',
-                'choices' => $shoolYears_arr
+                'choices' => $this->getSchoolYears()
             ])
             ->add('SchoolYearIdOrig', 'hidden')
             ->add('DateStart', 'datepicker',[
@@ -41,5 +27,27 @@ class PeriodForm extends Form
                 'label' => 'Date End',
                 'date' => true
             ]);
+    }
+    
+    private function getPeriods() {
+        $periods = PeriodQuery::create()->orderBySequence()->find();
+        $periods_arr = [];
+        foreach($periods as $period){
+            $name = $period->__toString();
+            $id = $period->getId();
+            $periods_arr[$id] = $name;
+        }
+        return $periods_arr;
+    }
+    
+    private function getSchoolYears() {
+        $schoolYears = SchoolYearQuery::create()->orderByYear('desc')->find();
+        $schoolYears_arr = [];
+        foreach($schoolYears as $schoolYear){
+            $name = $schoolYear->__toString();
+            $id = $schoolYear->getId();
+            $schoolYears_arr[$id] = $name;
+        }
+        return $schoolYears_arr;
     }
 }

@@ -12,7 +12,7 @@ class ProfessorList extends BaseList {
 	 */
 	public function __construct($request,$path,$page)
 	{
-		$this->keys = array('#','first_name', 'last_name');
+		$this->keys = array('#','last_name', 'first_name');
 		$this->createList($request,$path,$page);
 	}
     
@@ -35,8 +35,8 @@ class ProfessorList extends BaseList {
 	    foreach($this->professors->paginate($page, $this->maxPerPage) as $key => $professor){
 			$professor_id = $professor->getId();
 			$this->data_arr[$professor_id]['#'] = ($page - 1) * $this->maxPerPage + $key+1;
+			$this->data_arr[$professor_id]['last_name'] = $professor->getLastName();
 			$this->data_arr[$professor_id]['first_name'] = $professor->getFirstName();
-            $this->data_arr[$professor_id]['last_name'] = $professor->getLastName();
 	    }
     }
 	
@@ -45,7 +45,9 @@ class ProfessorList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->professors = ProfessorQuery::create();
+		$this->professors = ProfessorQuery::create()
+			->orderByLastName()
+			->orderByFirstName();
         if(isset($array['FirstName']) && $array['FirstName'] !== "") $this->professors->where("professor.first_name like '%".$array['FirstName']."%'");
         if(isset($array['LastName']) && $array['LastName'] !== "") $this->professors->where("professor.last_name like '%".$array['LastName']."%'");
         

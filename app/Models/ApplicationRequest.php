@@ -1,6 +1,8 @@
 <?php
 
-use Base\ApplicationRequest as BaseApplicationRequest;
+namespace App\Models;
+
+use App\Models\Base\ApplicationRequest as BaseApplicationRequest;
 
 /**
  * Skeleton subclass for representing a row from the 'application_request' table.

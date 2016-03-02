@@ -7,7 +7,7 @@ class AdminCredentialForm extends Form
 {
     public function buildForm()
     {
-        $credentials = AdminCredentialQuery::create()->find();//->where('group_id != 1')
+        $credentials = AdminCredentialQuery::create()->find();
         $credentials_arr = array();
         foreach($credentials as $credential){
             $name = $credential->getName();

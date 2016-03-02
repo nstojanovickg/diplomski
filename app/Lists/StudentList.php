@@ -11,7 +11,7 @@ class StudentList extends BaseList {
 	 */
 	public function __construct($request,$path,$page)
 	{
-		$this->keys = array('#','id_num/year','course','first_name', 'last_name','birth_place', 'birthday', 'account_amount','phone');
+		$this->keys = array('#','id_num/year','course','first_name', 'last_name','birth_place', 'birthday', 'phone');
 		$this->createList($request,$path,$page);
 	}
     
@@ -40,7 +40,6 @@ class StudentList extends BaseList {
             $this->data_arr[$id]['last_name'] = $object->getLastName();
             $this->data_arr[$id]['birth_place'] = $object->getBirthPlace();
             $this->data_arr[$id]['birthday'] = $object->getBirthday();
-            $this->data_arr[$id]['account_amount'] = $object->getAccountAmount();
 			$this->data_arr[$id]['phone'] = $object->getPhoneNumber();
 	    }
     }
@@ -50,7 +49,11 @@ class StudentList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = StudentQuery::create();
+		$this->objects = StudentQuery::create()
+			->useSchoolYearQuery()
+				->orderByYear('desc')
+			->endUse()
+			->orderByIdentificationNumber();
         if(isset($array['IdentificationNumber']) && $array['IdentificationNumber'] !== "") $this->objects->where("student.identification_number = ?",$array['IdentificationNumber']);
         if(isset($array['SchoolYearId']) && $array['SchoolYearId'] !== "") $this->objects->where("student.school_year_id = ?", $array['SchoolYearId']);
         if(isset($array['CourseId']) && $array['CourseId'] !== "") $this->objects->where("student.course_id = '".$array['CourseId']."'");
@@ -59,9 +62,7 @@ class StudentList extends BaseList {
         if(isset($array['BirthPlace']) && $array['BirthPlace'] !== "") $this->objects->where("student.birth_place like '%".$array['BirthPlace']."%'");
         if(isset($array['BirthdayFrom']) && $array['BirthdayFrom'] !== "") $this->objects->where("student.birthday >= ?",$array['BirthdayFrom']);
         if(isset($array['BirthdayTo']) && $array['BirthdayTo'] !== "") $this->objects->where("student.birthday <= ?",$array['BirthdayTo']);
-        if(isset($array['AccountAmountFrom']) && $array['AccountAmountFrom'] !== "") $this->objects->where("student.account_amount >= ?",$array['AccountAmountFrom']);
-        if(isset($array['AccountAmountTo']) && $array['AccountAmountTo'] !== "") $this->objects->where("student.account_amount ?= ?",$array['AccountAmountTo']);
-        if(isset($array['PhoneNumber']) && $array['PhoneNumber'] !== "") $this->objects->where("student.phone_number like '%".$array['PhoneNumber']."%'");
+		if(isset($array['PhoneNumber']) && $array['PhoneNumber'] !== "") $this->objects->where("student.phone_number like '%".$array['PhoneNumber']."%'");
         
 		if($search) session(['student_filter' => $array]);
 	}

@@ -32,9 +32,9 @@ class TranslationController extends Controller {
 		$form_filter = $formBuilder->create('App\Filters\TranslationKeywordFilter', [
 			'method' => 'PATCH',
 			'action' => ['TranslationController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		session(['attributes' => \Lang::get('general.TRANSLATIONS')]);
 		session(['attribute' => \Lang::get('general.TRANSLATION')]);
         
 		return view('list', [
@@ -43,7 +43,7 @@ class TranslationController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'TRANSLATION',
+								'title' => 'TRANSLATIONS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -66,7 +66,7 @@ class TranslationController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'TRANSLATION';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.TRANSLATION')]);
@@ -147,7 +147,7 @@ class TranslationController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'TRANSLATION';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.TRANSLATION')]);

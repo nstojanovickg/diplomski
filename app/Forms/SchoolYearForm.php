@@ -7,6 +7,7 @@ class SchoolYearForm extends Form
     public function buildForm()
     {
         $this
+            ->add('Id', 'hidden')
             ->add('Year', 'number')
             ->add('DateStart', 'datepicker',[
                 'label' => 'Date Start',

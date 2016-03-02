@@ -59,7 +59,7 @@ class ApplicationRequestTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ApplicationRequestTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -77,9 +77,19 @@ class ApplicationRequestTableMap extends TableMap
     const COL_ID = 'application_request.id';
 
     /**
+     * the column name for the application_id field
+     */
+    const COL_APPLICATION_ID = 'application_request.application_id';
+
+    /**
      * the column name for the description field
      */
     const COL_DESCRIPTION = 'application_request.description';
+
+    /**
+     * the column name for the response field
+     */
+    const COL_RESPONSE = 'application_request.response';
 
     /**
      * the column name for the created_at field
@@ -103,11 +113,11 @@ class ApplicationRequestTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Description', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'description', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ApplicationRequestTableMap::COL_ID, ApplicationRequestTableMap::COL_DESCRIPTION, ApplicationRequestTableMap::COL_CREATED_AT, ApplicationRequestTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'description', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'ApplicationId', 'Description', 'Response', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'applicationId', 'description', 'response', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ApplicationRequestTableMap::COL_ID, ApplicationRequestTableMap::COL_APPLICATION_ID, ApplicationRequestTableMap::COL_DESCRIPTION, ApplicationRequestTableMap::COL_RESPONSE, ApplicationRequestTableMap::COL_CREATED_AT, ApplicationRequestTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'application_id', 'description', 'response', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -117,11 +127,11 @@ class ApplicationRequestTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Description' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'description' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(ApplicationRequestTableMap::COL_ID => 0, ApplicationRequestTableMap::COL_DESCRIPTION => 1, ApplicationRequestTableMap::COL_CREATED_AT => 2, ApplicationRequestTableMap::COL_UPDATED_AT => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'description' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ApplicationId' => 1, 'Description' => 2, 'Response' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'applicationId' => 1, 'description' => 2, 'response' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ApplicationRequestTableMap::COL_ID => 0, ApplicationRequestTableMap::COL_APPLICATION_ID => 1, ApplicationRequestTableMap::COL_DESCRIPTION => 2, ApplicationRequestTableMap::COL_RESPONSE => 3, ApplicationRequestTableMap::COL_CREATED_AT => 4, ApplicationRequestTableMap::COL_UPDATED_AT => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'application_id' => 1, 'description' => 2, 'response' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -142,7 +152,9 @@ class ApplicationRequestTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('application_id', 'ApplicationId', 'INTEGER', 'application', 'id', false, null, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('response', 'Response', 'VARCHAR', false, 255, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -152,13 +164,13 @@ class ApplicationRequestTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('SmsCallLog', '\\App\\Models\\SmsCallLog', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Application', '\\App\\Models\\Application', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':application_request_id',
+    0 => ':application_id',
     1 => ':id',
   ),
-), 'CASCADE', null, 'SmsCallLogs', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -173,15 +185,6 @@ class ApplicationRequestTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to application_request     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in related instance pools,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        SmsCallLogTableMap::clearInstancePool();
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -325,12 +328,16 @@ class ApplicationRequestTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(ApplicationRequestTableMap::COL_ID);
+            $criteria->addSelectColumn(ApplicationRequestTableMap::COL_APPLICATION_ID);
             $criteria->addSelectColumn(ApplicationRequestTableMap::COL_DESCRIPTION);
+            $criteria->addSelectColumn(ApplicationRequestTableMap::COL_RESPONSE);
             $criteria->addSelectColumn(ApplicationRequestTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(ApplicationRequestTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.application_id');
             $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.response');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

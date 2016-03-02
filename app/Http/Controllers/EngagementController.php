@@ -26,15 +26,14 @@ class EngagementController extends Controller {
 		$data_arr = $engagementList->getDataArr();
 		$paginationForm = $engagementList->getPaginationForm();
 		$filter = session('engagement_filter');
+		session(['attribute' => \Lang::get('general.ENGAGEMENT')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\EngagementFilter', [
 			'method' => 'PATCH',
 			'action' => ['EngagementController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		
-		session(['attribute' => \Lang::get('general.ENGAGEMENTS')]);
-		session(['attribute' => \Lang::get('general.ENGAGEMENT')]);
         
 		return view('list', [
 								'controller' => 'EngagementController',
@@ -42,7 +41,7 @@ class EngagementController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'ENGAGEMENT',
+								'title' => 'ENGAGEMENTS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -65,7 +64,7 @@ class EngagementController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'ENGAGEMENT';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.ENGAGEMENT')]);
@@ -107,27 +106,26 @@ class EngagementController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($pid, $sid, $cid, $syid, FormBuilder $formBuilder)
+	public function edit($sid, $cid, $syid, FormBuilder $formBuilder)
 	{
-		if(!isset($pid) || !isset($sid) || !isset($cid) || !isset($syid))
+		if(!isset($sid) || !isset($cid) || !isset($syid))
 			return redirect($this->main_page);
 		
         $engagement_arr = [];
-		$engagement = EngagementQuery::create()->findPK([$pid, $sid, $cid, $syid]);
+		$engagement = EngagementQuery::create()->findPK([$sid, $cid, $syid]);
 		$engagement_arr = $engagement->toArray();
-		$period_arr['ProfessorIdOrig'] = $engagement->getProfessorId();
-		$period_arr['SubjectIdOrig'] = $engagement->getSubjectId();
-		$period_arr['CourseIdOrig'] = $engagement->getCourseId();
-		$period_arr['SchoolYearIdOrig'] = $engagement->getSchoolYearId();
+		$engagement_arr['SubjectIdOrig'] = $engagement->getSubjectId();
+		$engagement_arr['CourseIdOrig'] = $engagement->getCourseId();
+		$engagement_arr['SchoolYearIdOrig'] = $engagement->getSchoolYearId();
 		
 		$form = $formBuilder->create('App\Forms\EngagementForm', [
 			'method' => 'PATCH',
-			'action' => ['EngagementController@update', $pid, $sid, $cid, $syid],
+			'action' => ['EngagementController@update', $sid, $cid, $syid],
 			'model' => $engagement_arr,
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'ENGAGEMENT';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		session(['attribute' => \Lang::get('general.ENGAGEMENT')]);
         
@@ -140,7 +138,7 @@ class EngagementController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($pid, $sid, $cid, $syid, EngagementRequest $request)
+	public function update($sid, $cid, $syid, EngagementRequest $request)
 	{
         $data = $request->all();
 		$con = Propel::getConnection();
@@ -149,7 +147,7 @@ class EngagementController extends Controller {
 			subject_id = ".$data['SubjectId'].",
 			course_id = ".$data['CourseId'].",
 			school_year_id = ".$data['SchoolYearId']."
-		where professor_id = $pid and subject_id = $sid and course_id = $cid and school_year_id = $syid;";
+		where subject_id = $sid and course_id = $cid and school_year_id = $syid;";
 		$stmt = $con->prepare($sql);
 		$stmt->execute();
 		
@@ -164,9 +162,9 @@ class EngagementController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($pid, $sid, $cid, $syid)
+	public function destroy($sid, $cid, $syid)
 	{
-		$engagement = EngagementQuery::create()->findPK([$pid, $sid, $cid, $syid]);
+		$engagement = EngagementQuery::create()->findPK([$sid, $cid, $syid]);
 		$engagement->delete();
 		
 		flash()->success("DELETED");

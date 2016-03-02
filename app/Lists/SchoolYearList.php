@@ -46,10 +46,9 @@ class SchoolYearList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = SchoolYearQuery::create();
+		$this->objects = SchoolYearQuery::create()
+			->orderByYear('desc');
         if(isset($array['Year']) && $array['Year'] !== "") $this->objects->where("SchoolYear.year = ?",$array['Year']);
-        //if(isset($array['DateStart']) && $array['DateStart'] !== "") $this->objects->where("SchoolYear.date_start >= ?",$array['DateStart']);
-        //if(isset($array['DateEnd']) && $array['DateEnd'] !== "") $this->objects->where("SchoolYear.date_end <= ?",$array['DateEnd']);
         if(isset($array['Description']) && $array['Description'] !== "") $this->objects->where("SchoolYear.description like '%".$array['Description']."%'");
         
 		if($search) session(['SchoolYear_filter' => $array]);

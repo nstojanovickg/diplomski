@@ -44,15 +44,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildSubjectQuery rightJoinEngagement($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Engagement relation
  * @method     ChildSubjectQuery innerJoinEngagement($relationAlias = null) Adds a INNER JOIN clause to the query using the Engagement relation
  *
- * @method     ChildSubjectQuery leftJoinSmsCallLog($relationAlias = null) Adds a LEFT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildSubjectQuery rightJoinSmsCallLog($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildSubjectQuery innerJoinSmsCallLog($relationAlias = null) Adds a INNER JOIN clause to the query using the SmsCallLog relation
- *
  * @method     ChildSubjectQuery leftJoinStudyProgram($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudyProgram relation
  * @method     ChildSubjectQuery rightJoinStudyProgram($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudyProgram relation
  * @method     ChildSubjectQuery innerJoinStudyProgram($relationAlias = null) Adds a INNER JOIN clause to the query using the StudyProgram relation
  *
- * @method     \App\Models\ApplicationQuery|\App\Models\EngagementQuery|\App\Models\SmsCallLogQuery|\App\Models\StudyProgramQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \App\Models\ApplicationQuery|\App\Models\EngagementQuery|\App\Models\StudyProgramQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildSubject findOne(ConnectionInterface $con = null) Return the first ChildSubject matching the query
  * @method     ChildSubject findOneOrCreate(ConnectionInterface $con = null) Return the first ChildSubject matching the query, or a new ChildSubject object populated from the query conditions when no match is found
@@ -589,79 +585,6 @@ abstract class SubjectQuery extends ModelCriteria
         return $this
             ->joinEngagement($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Engagement', '\App\Models\EngagementQuery');
-    }
-
-    /**
-     * Filter the query by a related \App\Models\SmsCallLog object
-     *
-     * @param \App\Models\SmsCallLog|ObjectCollection $smsCallLog the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildSubjectQuery The current query, for fluid interface
-     */
-    public function filterBySmsCallLog($smsCallLog, $comparison = null)
-    {
-        if ($smsCallLog instanceof \App\Models\SmsCallLog) {
-            return $this
-                ->addUsingAlias(SubjectTableMap::COL_ID, $smsCallLog->getSubjectId(), $comparison);
-        } elseif ($smsCallLog instanceof ObjectCollection) {
-            return $this
-                ->useSmsCallLogQuery()
-                ->filterByPrimaryKeys($smsCallLog->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterBySmsCallLog() only accepts arguments of type \App\Models\SmsCallLog or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the SmsCallLog relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildSubjectQuery The current query, for fluid interface
-     */
-    public function joinSmsCallLog($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('SmsCallLog');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'SmsCallLog');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the SmsCallLog relation SmsCallLog object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \App\Models\SmsCallLogQuery A secondary query class using the current class as primary query
-     */
-    public function useSmsCallLogQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinSmsCallLog($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'SmsCallLog', '\App\Models\SmsCallLogQuery');
     }
 
     /**

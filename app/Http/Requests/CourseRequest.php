@@ -21,8 +21,11 @@ class CourseRequest extends Request {
 	 */
 	public function rules()
 	{
+		$id_arr = Request::only('Id');
+		$id = $id_arr['Id'];
+		
 		return [
-			'Name' => 'required|max:100|unique'
+			'Name' => 'required|max:100|unique:course,name,'.$id
 		];
 	}
 

@@ -132,10 +132,10 @@ abstract class EngagementQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56, 78), $con);
+     * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param array[$professor_id, $subject_id, $course_id, $school_year_id] $key Primary key to use for the query
+     * @param array[$subject_id, $course_id, $school_year_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildEngagement|array|mixed the result, formatted by the current formatter
@@ -145,7 +145,7 @@ abstract class EngagementQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = EngagementTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2], (string) $key[3]))))) && !$this->formatter) {
+        if ((null !== ($obj = EngagementTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -175,13 +175,12 @@ abstract class EngagementQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT professor_id, subject_id, course_id, school_year_id, created_at, updated_at FROM engagement WHERE professor_id = :p0 AND subject_id = :p1 AND course_id = :p2 AND school_year_id = :p3';
+        $sql = 'SELECT professor_id, subject_id, course_id, school_year_id, created_at, updated_at FROM engagement WHERE subject_id = :p0 AND course_id = :p1 AND school_year_id = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
             $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
-            $stmt->bindValue(':p3', $key[3], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -192,7 +191,7 @@ abstract class EngagementQuery extends ModelCriteria
             /** @var ChildEngagement $obj */
             $obj = new ChildEngagement();
             $obj->hydrate($row);
-            EngagementTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2], (string) $key[3])));
+            EngagementTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -251,10 +250,9 @@ abstract class EngagementQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(EngagementTableMap::COL_PROFESSOR_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(EngagementTableMap::COL_SUBJECT_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(EngagementTableMap::COL_COURSE_ID, $key[2], Criteria::EQUAL);
-        $this->addUsingAlias(EngagementTableMap::COL_SCHOOL_YEAR_ID, $key[3], Criteria::EQUAL);
+        $this->addUsingAlias(EngagementTableMap::COL_SUBJECT_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(EngagementTableMap::COL_COURSE_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(EngagementTableMap::COL_SCHOOL_YEAR_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -272,13 +270,11 @@ abstract class EngagementQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(EngagementTableMap::COL_PROFESSOR_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(EngagementTableMap::COL_SUBJECT_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(EngagementTableMap::COL_SUBJECT_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(EngagementTableMap::COL_COURSE_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(EngagementTableMap::COL_COURSE_ID, $key[2], Criteria::EQUAL);
+            $cton2 = $this->getNewCriterion(EngagementTableMap::COL_SCHOOL_YEAR_ID, $key[2], Criteria::EQUAL);
             $cton0->addAnd($cton2);
-            $cton3 = $this->getNewCriterion(EngagementTableMap::COL_SCHOOL_YEAR_ID, $key[3], Criteria::EQUAL);
-            $cton0->addAnd($cton3);
             $this->addOr($cton0);
         }
 
@@ -861,11 +857,10 @@ abstract class EngagementQuery extends ModelCriteria
     public function prune($engagement = null)
     {
         if ($engagement) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(EngagementTableMap::COL_PROFESSOR_ID), $engagement->getProfessorId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(EngagementTableMap::COL_SUBJECT_ID), $engagement->getSubjectId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(EngagementTableMap::COL_COURSE_ID), $engagement->getCourseId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond3', $this->getAliasedColName(EngagementTableMap::COL_SCHOOL_YEAR_ID), $engagement->getSchoolYearId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2', 'pruneCond3'), Criteria::LOGICAL_OR);
+            $this->addCond('pruneCond0', $this->getAliasedColName(EngagementTableMap::COL_SUBJECT_ID), $engagement->getSubjectId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(EngagementTableMap::COL_COURSE_ID), $engagement->getCourseId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(EngagementTableMap::COL_SCHOOL_YEAR_ID), $engagement->getSchoolYearId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
         return $this;

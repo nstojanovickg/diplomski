@@ -25,23 +25,22 @@ class SubjectController extends Controller {
 		$data_arr = $subjectList->getDataArr();
 		$paginationForm = $subjectList->getPaginationForm();
 		$filter = session('subject_filter');
+		session(['attribute' => \Lang::get('general.SUBJECT')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\SubjectFilter', [
 			'method' => 'PATCH',
 			'action' => ['SubjectController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
 		
-		session(['attribute' => \Lang::get('general.SUBJECTS')]);
-		session(['attribute' => \Lang::get('general.SUBJECT')]);
-        
 		return view('list', [
 								'controller' => 'SubjectController',
 								'data_arr' => $data_arr,
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'SUBJECT',
+								'title' => 'SUBJECTS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -64,7 +63,7 @@ class SubjectController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'SUBJECT';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.SUBJECT')]);
@@ -80,6 +79,7 @@ class SubjectController extends Controller {
 	public function store(SubjectRequest $request)
 	{
 		$data = $request->all();
+		unset($data['Id']);
 		$subject = new Subject();
         $subject->fromArray($data);
         $subject->save();
@@ -119,7 +119,7 @@ class SubjectController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'SUBJECT';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		session(['attribute' => \Lang::get('general.SUBJECT')]);
         

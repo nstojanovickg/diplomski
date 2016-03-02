@@ -22,25 +22,14 @@ class TranslationKeywordFilter extends Form
         
         $this
             ->add('CatalogId', 'select',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
                 'choices' => $translation_arr,
                 'label' => 'Catalog'
             ])
-            ->add('Keyword', 'text',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ]);
+            ->add('Keyword', 'text');
         foreach($translationLanguages as $translationLanguage){
             $language_name =  $translationLanguage->getName();
             
-            $this->add($language_name, 'text',[
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ]);
+            $this->add($language_name, 'text');
         }
     }
 }

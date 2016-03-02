@@ -26,12 +26,12 @@ class CourseController extends Controller {
 		$paginationForm = $courseList->getPaginationForm();
 		$filter = session('course_filter');
 		
-		session(['attribute' => \Lang::get('general.COURSES')]);
 		session(['attribute' => \Lang::get('general.COURSE')]);
 		$form_filter = $formBuilder->create('App\Filters\CourseFilter', [
 			'method' => 'PATCH',
 			'action' => ['CourseController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
         
 		return view('list', [
@@ -40,7 +40,7 @@ class CourseController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'COURSE',
+								'title' => 'COURSES',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -63,10 +63,10 @@ class CourseController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'COURSE';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
+		session(['attribute' => \Lang::get('general.COURSE')]);
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.COURSE')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -79,6 +79,7 @@ class CourseController extends Controller {
 	public function store(CourseRequest $request)
 	{
 		$data = $request->all();
+		unset($data['Id']);
 		$course = new Course();
         $course->fromArray($data);
         $course->save();
@@ -118,7 +119,7 @@ class CourseController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'COURSE';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		session(['attribute' => \Lang::get('general.COURSE')]);
         

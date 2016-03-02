@@ -12,7 +12,7 @@ class ApplicationList extends BaseList {
 	 */
 	public function __construct($request,$path,$page)
 	{
-		$this->keys = array('#','student','subject','period','school_year_id','application_date','exam_date','exam_score');
+		$this->keys = array('#','student','subject','period','school_year_id','application_date','exam_date','exam_time','exam_score');
 		$this->createList($request,$path,$page);
 	}
     
@@ -39,10 +39,10 @@ class ApplicationList extends BaseList {
 			$this->data_arr[$id]['subject'] = $object->getSubject()->__toString();
 			$this->data_arr[$id]['period'] = $object->getPeriod()->__toString();
 			$this->data_arr[$id]['school_year_id'] = $object->getSchoolYear()->__toString();
-			//$this->data_arr[$id]['oral_exam_invitation_id'] = !is_null($object->getOralExamInvitationId()) ? $object->getOralExamInvitation()->__toString() : '';
 			$this->data_arr[$id]['application_date'] = $object->getApplicationDate();//->format('Y-m-d H:i:s');
 			$this->data_arr[$id]['exam_date'] = $object->getExamDate();
-			$this->data_arr[$id]['exam_score'] = $object->getExamScore();
+			$this->data_arr[$id]['exam_time'] = $object->getExamTime();
+			$this->data_arr[$id]['exam_score'] = $object->getExamScore() == 0 ? '' : $object->getExamScore();
 	    }
     }
 	
@@ -52,19 +52,23 @@ class ApplicationList extends BaseList {
 	 */
 	protected function createQuery($array, $search){
 		$this->objects = ApplicationQuery::create();
-		$this->objects->join('Application.Subject');
-		$this->objects->join('Application.SchoolYear');
-		$this->objects->join('Application.Student');
-		$this->objects->join('Student.Course');
-		//$c->addJoin(BookTableMap::AUTHOR_ID, AuthorTableMap::ID, Criteria::INNER_JOIN);
-		$this->objects->join('Course.Engagement');
-		$this->objects->where('Engagement.subject_id = subject.id');
-		$this->objects->where('Engagement.school_year_id = school_year.id');
 		
 		if(isset($array['StudentId']) && $array['StudentId'] !== "") $this->objects->where("application.student_id = ".$array['StudentId']);
 		if(isset($array['SubjectId']) && $array['SubjectId'] !== "") $this->objects->where("application.subject_id = ".$array['SubjectId']);
-		if(isset($array['ProfessorId']) && $array['ProfessorId'] !== "") $this->objects->where('Engagement.ProfessorId = ?', $array['ProfessorId']);
-		if(\Auth::user()->getStatus() == 'professor'){
+		if(isset($array['ProfessorId']) && $array['ProfessorId'] !== "") {
+			$this->objects->join('Application.Student');
+			$this->objects->join('Student.Course');
+			$this->objects->join('Course.Engagement');
+			$this->objects->where('Engagement.subject_id = Application.subject_id');
+			$this->objects->where('Engagement.school_year_id = Application.school_year_id');
+			$this->objects->where('Engagement.ProfessorId = ?', $array['ProfessorId']);
+		}
+		if(\Auth::user()->getStatus() == 'professor') {
+			$this->objects->join('Application.Student');
+			$this->objects->join('Student.Course');
+			$this->objects->join('Course.Engagement');
+			$this->objects->where('Engagement.subject_id = Application.subject_id');
+			$this->objects->where('Engagement.school_year_id = Application.school_year_id');
 			$professor_id = \Auth::user()->getProfessorId();
 			$this->objects->where('Engagement.ProfessorId = ?', $professor_id);
 		}

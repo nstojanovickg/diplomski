@@ -151,7 +151,7 @@ class EngagementTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('professor_id', 'ProfessorId', 'INTEGER' , 'professor', 'id', true, null, null);
+        $this->addForeignKey('professor_id', 'ProfessorId', 'INTEGER', 'professor', 'id', true, null, null);
         $this->addForeignPrimaryKey('subject_id', 'SubjectId', 'INTEGER' , 'subject', 'id', true, null, null);
         $this->addForeignPrimaryKey('course_id', 'CourseId', 'INTEGER' , 'course', 'id', true, null, null);
         $this->addForeignPrimaryKey('school_year_id', 'SchoolYearId', 'INTEGER' , 'school_year', 'id', true, null, null);
@@ -222,7 +222,7 @@ class EngagementTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getProfessorId(), (string) $obj->getSubjectId(), (string) $obj->getCourseId(), (string) $obj->getSchoolYearId()));
+                $key = serialize(array((string) $obj->getSubjectId(), (string) $obj->getCourseId(), (string) $obj->getSchoolYearId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -242,11 +242,11 @@ class EngagementTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \App\Models\Engagement) {
-                $key = serialize(array((string) $value->getProfessorId(), (string) $value->getSubjectId(), (string) $value->getCourseId(), (string) $value->getSchoolYearId()));
+                $key = serialize(array((string) $value->getSubjectId(), (string) $value->getCourseId(), (string) $value->getSchoolYearId()));
 
-            } elseif (is_array($value) && count($value) === 4) {
+            } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2], (string) $value[3]));
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
             } elseif ($value instanceof Criteria) {
                 self::$instances = [];
 
@@ -276,11 +276,11 @@ class EngagementTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfessorId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('SubjectId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CourseId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('SchoolYearId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('SubjectId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CourseId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('SchoolYearId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfessorId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('SubjectId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CourseId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('SchoolYearId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('SubjectId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CourseId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('SchoolYearId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -299,11 +299,6 @@ class EngagementTableMap extends TableMap
     {
             $pks = [];
 
-        $pks[] = (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('ProfessorId', TableMap::TYPE_PHPNAME, $indexType)
-        ];
         $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 1 + $offset
@@ -491,10 +486,9 @@ class EngagementTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(EngagementTableMap::COL_PROFESSOR_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(EngagementTableMap::COL_SUBJECT_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(EngagementTableMap::COL_COURSE_ID, $value[2]));
-                $criterion->addAnd($criteria->getNewCriterion(EngagementTableMap::COL_SCHOOL_YEAR_ID, $value[3]));
+                $criterion = $criteria->getNewCriterion(EngagementTableMap::COL_SUBJECT_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(EngagementTableMap::COL_COURSE_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(EngagementTableMap::COL_SCHOOL_YEAR_ID, $value[2]));
                 $criteria->addOr($criterion);
             }
         }

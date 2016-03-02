@@ -30,10 +30,10 @@ class StudyProgramController extends Controller {
 		$form_filter = $formBuilder->create('App\Filters\StudyProgramFilter', [
 			'method' => 'PATCH',
 			'action' => ['StudyProgramController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
 		
-		session(['attribute' => \Lang::get('general.STUDY_PROGRAMS')]);
 		session(['attribute' => \Lang::get('general.STUDY_PROGRAM')]);
         
 		return view('list', [
@@ -65,7 +65,7 @@ class StudyProgramController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'STUDY_PROGRAM';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
 		session(['attribute' => \Lang::get('general.STUDY_PROGRAM')]);
@@ -122,7 +122,7 @@ class StudyProgramController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'STUDY_PROGRAM';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		session(['attribute' => \Lang::get('general.STUDY_PROGRAM')]);
         

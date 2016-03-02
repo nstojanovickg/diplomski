@@ -25,16 +25,15 @@ class ApplicationController extends Controller {
 		$data_arr = $applicationList->getDataArr();
 		$paginationForm = $applicationList->getPaginationForm();
 		$filter = session('application_filter');
+		session(['attribute' => \Lang::get('general.APPLICATION_OBJ')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\ApplicationFilter', [
 			'method' => 'PATCH',
 			'action' => ['ApplicationController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
 		
-		session(['attributes' => \Lang::get('general.APPLICATIONS')]);
-		session(['attribute' => \Lang::get('general.APPLICATION')]);
-        
 		$edit = true;
 		$delete = (\Auth::user()->getStatus() == 'professor') ? false : true;
 		return view('list', [
@@ -43,7 +42,7 @@ class ApplicationController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'APPLICATION',
+								'title' => 'APPLICATIONS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -68,10 +67,10 @@ class ApplicationController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'APPLICATION';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.APPLICATION')]);
+		session(['attribute' => \Lang::get('general.APPLICATION_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -117,6 +116,7 @@ class ApplicationController extends Controller {
         $application_arr = [];
 		$application = ApplicationQuery::create()->findPK($id);
 		$application_arr = $application->toArray();
+		//echo "<pre>";print_r($application_arr);die;
 		
 		$form = $formBuilder->create('App\Forms\ApplicationForm', [
 			'method' => 'PATCH',
@@ -125,10 +125,10 @@ class ApplicationController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'APPLICATION';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.APPLICATION')]);
+		session(['attribute' => \Lang::get('general.APPLICATION_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 		

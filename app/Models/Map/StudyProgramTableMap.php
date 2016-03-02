@@ -164,17 +164,17 @@ class StudyProgramTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Subject', '\\App\\Models\\Subject', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':subject_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, null, false);
         $this->addRelation('Course', '\\App\\Models\\Course', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':course_id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
+        $this->addRelation('Subject', '\\App\\Models\\Subject', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':subject_id',
     1 => ':id',
   ),
 ), 'CASCADE', null, null, false);

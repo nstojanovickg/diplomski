@@ -21,8 +21,11 @@ class SchoolYearRequest extends Request {
 	 */
 	public function rules()
 	{
+		$id_arr = Request::only('Id');
+		$id = $id_arr['Id'];
+		
 		return [
-			'Year' => 'required|integer|max:'.date('Y').'|unique',
+			'Year' => 'required|integer|max:'.date('Y').'|unique:school_year,year,'.$id,
 			'DateStart' => 'date',
 			'DateEnd' => 'date',
 			'Description' => 'max:255'

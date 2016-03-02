@@ -38,15 +38,15 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudyProgramQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildStudyProgramQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildStudyProgramQuery leftJoinSubject($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subject relation
- * @method     ChildStudyProgramQuery rightJoinSubject($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subject relation
- * @method     ChildStudyProgramQuery innerJoinSubject($relationAlias = null) Adds a INNER JOIN clause to the query using the Subject relation
- *
  * @method     ChildStudyProgramQuery leftJoinCourse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Course relation
  * @method     ChildStudyProgramQuery rightJoinCourse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Course relation
  * @method     ChildStudyProgramQuery innerJoinCourse($relationAlias = null) Adds a INNER JOIN clause to the query using the Course relation
  *
- * @method     \App\Models\SubjectQuery|\App\Models\CourseQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildStudyProgramQuery leftJoinSubject($relationAlias = null) Adds a LEFT JOIN clause to the query using the Subject relation
+ * @method     ChildStudyProgramQuery rightJoinSubject($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Subject relation
+ * @method     ChildStudyProgramQuery innerJoinSubject($relationAlias = null) Adds a INNER JOIN clause to the query using the Subject relation
+ *
+ * @method     \App\Models\CourseQuery|\App\Models\SubjectQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildStudyProgram findOne(ConnectionInterface $con = null) Return the first ChildStudyProgram matching the query
  * @method     ChildStudyProgram findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStudyProgram matching the query, or a new ChildStudyProgram object populated from the query conditions when no match is found
@@ -524,83 +524,6 @@ abstract class StudyProgramQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \App\Models\Subject object
-     *
-     * @param \App\Models\Subject|ObjectCollection $subject The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildStudyProgramQuery The current query, for fluid interface
-     */
-    public function filterBySubject($subject, $comparison = null)
-    {
-        if ($subject instanceof \App\Models\Subject) {
-            return $this
-                ->addUsingAlias(StudyProgramTableMap::COL_SUBJECT_ID, $subject->getId(), $comparison);
-        } elseif ($subject instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(StudyProgramTableMap::COL_SUBJECT_ID, $subject->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterBySubject() only accepts arguments of type \App\Models\Subject or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Subject relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildStudyProgramQuery The current query, for fluid interface
-     */
-    public function joinSubject($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Subject');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Subject');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Subject relation Subject object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \App\Models\SubjectQuery A secondary query class using the current class as primary query
-     */
-    public function useSubjectQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinSubject($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Subject', '\App\Models\SubjectQuery');
-    }
-
-    /**
      * Filter the query by a related \App\Models\Course object
      *
      * @param \App\Models\Course|ObjectCollection $course The related object(s) to use as filter
@@ -675,6 +598,83 @@ abstract class StudyProgramQuery extends ModelCriteria
         return $this
             ->joinCourse($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Course', '\App\Models\CourseQuery');
+    }
+
+    /**
+     * Filter the query by a related \App\Models\Subject object
+     *
+     * @param \App\Models\Subject|ObjectCollection $subject The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildStudyProgramQuery The current query, for fluid interface
+     */
+    public function filterBySubject($subject, $comparison = null)
+    {
+        if ($subject instanceof \App\Models\Subject) {
+            return $this
+                ->addUsingAlias(StudyProgramTableMap::COL_SUBJECT_ID, $subject->getId(), $comparison);
+        } elseif ($subject instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(StudyProgramTableMap::COL_SUBJECT_ID, $subject->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterBySubject() only accepts arguments of type \App\Models\Subject or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Subject relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildStudyProgramQuery The current query, for fluid interface
+     */
+    public function joinSubject($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Subject');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Subject');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Subject relation Subject object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \App\Models\SubjectQuery A secondary query class using the current class as primary query
+     */
+    public function useSubjectQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSubject($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Subject', '\App\Models\SubjectQuery');
     }
 
     /**

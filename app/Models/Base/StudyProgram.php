@@ -103,14 +103,14 @@ abstract class StudyProgram implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ChildSubject
-     */
-    protected $aSubject;
-
-    /**
      * @var        ChildCourse
      */
     protected $aCourse;
+
+    /**
+     * @var        ChildSubject
+     */
+    protected $aSubject;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -679,8 +679,8 @@ abstract class StudyProgram implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aSubject = null;
             $this->aCourse = null;
+            $this->aSubject = null;
         } // if (deep)
     }
 
@@ -797,18 +797,18 @@ abstract class StudyProgram implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aSubject !== null) {
-                if ($this->aSubject->isModified() || $this->aSubject->isNew()) {
-                    $affectedRows += $this->aSubject->save($con);
-                }
-                $this->setSubject($this->aSubject);
-            }
-
             if ($this->aCourse !== null) {
                 if ($this->aCourse->isModified() || $this->aCourse->isNew()) {
                     $affectedRows += $this->aCourse->save($con);
                 }
                 $this->setCourse($this->aCourse);
+            }
+
+            if ($this->aSubject !== null) {
+                if ($this->aSubject->isModified() || $this->aSubject->isNew()) {
+                    $affectedRows += $this->aSubject->save($con);
+                }
+                $this->setSubject($this->aSubject);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1021,21 +1021,6 @@ abstract class StudyProgram implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aSubject) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'subject';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'subject';
-                        break;
-                    default:
-                        $key = 'Subject';
-                }
-
-                $result[$key] = $this->aSubject->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aCourse) {
 
                 switch ($keyType) {
@@ -1050,6 +1035,21 @@ abstract class StudyProgram implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aCourse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aSubject) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'subject';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'subject';
+                        break;
+                    default:
+                        $key = 'Subject';
+                }
+
+                $result[$key] = $this->aSubject->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1243,15 +1243,15 @@ abstract class StudyProgram implements ActiveRecordInterface
         $validPrimaryKeyFKs = 2;
         $primaryKeyFKs = [];
 
-        //relation fk_sp_su to table subject
-        if ($this->aSubject && $hash = spl_object_hash($this->aSubject)) {
+        //relation fk_sp_co to table course
+        if ($this->aCourse && $hash = spl_object_hash($this->aCourse)) {
             $primaryKeyFKs[] = $hash;
         } else {
             $validPrimaryKeyFKs = false;
         }
 
-        //relation fk_sp_co to table course
-        if ($this->aCourse && $hash = spl_object_hash($this->aCourse)) {
+        //relation fk_sp_su to table subject
+        if ($this->aSubject && $hash = spl_object_hash($this->aSubject)) {
             $primaryKeyFKs[] = $hash;
         } else {
             $validPrimaryKeyFKs = false;
@@ -1348,57 +1348,6 @@ abstract class StudyProgram implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildSubject object.
-     *
-     * @param  ChildSubject $v
-     * @return $this|\App\Models\StudyProgram The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setSubject(ChildSubject $v = null)
-    {
-        if ($v === null) {
-            $this->setSubjectId(NULL);
-        } else {
-            $this->setSubjectId($v->getId());
-        }
-
-        $this->aSubject = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildSubject object, it will not be re-added.
-        if ($v !== null) {
-            $v->addStudyProgram($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildSubject object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildSubject The associated ChildSubject object.
-     * @throws PropelException
-     */
-    public function getSubject(ConnectionInterface $con = null)
-    {
-        if ($this->aSubject === null && ($this->subject_id !== null)) {
-            $this->aSubject = ChildSubjectQuery::create()->findPk($this->subject_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aSubject->addStudyPrograms($this);
-             */
-        }
-
-        return $this->aSubject;
-    }
-
-    /**
      * Declares an association between this object and a ChildCourse object.
      *
      * @param  ChildCourse $v
@@ -1450,17 +1399,68 @@ abstract class StudyProgram implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildSubject object.
+     *
+     * @param  ChildSubject $v
+     * @return $this|\App\Models\StudyProgram The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setSubject(ChildSubject $v = null)
+    {
+        if ($v === null) {
+            $this->setSubjectId(NULL);
+        } else {
+            $this->setSubjectId($v->getId());
+        }
+
+        $this->aSubject = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildSubject object, it will not be re-added.
+        if ($v !== null) {
+            $v->addStudyProgram($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildSubject object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildSubject The associated ChildSubject object.
+     * @throws PropelException
+     */
+    public function getSubject(ConnectionInterface $con = null)
+    {
+        if ($this->aSubject === null && ($this->subject_id !== null)) {
+            $this->aSubject = ChildSubjectQuery::create()->findPk($this->subject_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aSubject->addStudyPrograms($this);
+             */
+        }
+
+        return $this->aSubject;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        if (null !== $this->aSubject) {
-            $this->aSubject->removeStudyProgram($this);
-        }
         if (null !== $this->aCourse) {
             $this->aCourse->removeStudyProgram($this);
+        }
+        if (null !== $this->aSubject) {
+            $this->aSubject->removeStudyProgram($this);
         }
         $this->subject_id = null;
         $this->course_id = null;
@@ -1488,8 +1488,8 @@ abstract class StudyProgram implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aSubject = null;
         $this->aCourse = null;
+        $this->aSubject = null;
     }
 
     /**

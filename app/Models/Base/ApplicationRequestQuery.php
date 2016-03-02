@@ -21,12 +21,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildApplicationRequestQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildApplicationRequestQuery orderByApplicationId($order = Criteria::ASC) Order by the application_id column
  * @method     ChildApplicationRequestQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method     ChildApplicationRequestQuery orderByResponse($order = Criteria::ASC) Order by the response column
  * @method     ChildApplicationRequestQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildApplicationRequestQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildApplicationRequestQuery groupById() Group by the id column
+ * @method     ChildApplicationRequestQuery groupByApplicationId() Group by the application_id column
  * @method     ChildApplicationRequestQuery groupByDescription() Group by the description column
+ * @method     ChildApplicationRequestQuery groupByResponse() Group by the response column
  * @method     ChildApplicationRequestQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildApplicationRequestQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -34,17 +38,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationRequestQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildApplicationRequestQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildApplicationRequestQuery leftJoinSmsCallLog($relationAlias = null) Adds a LEFT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildApplicationRequestQuery rightJoinSmsCallLog($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildApplicationRequestQuery innerJoinSmsCallLog($relationAlias = null) Adds a INNER JOIN clause to the query using the SmsCallLog relation
+ * @method     ChildApplicationRequestQuery leftJoinApplication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Application relation
+ * @method     ChildApplicationRequestQuery rightJoinApplication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Application relation
+ * @method     ChildApplicationRequestQuery innerJoinApplication($relationAlias = null) Adds a INNER JOIN clause to the query using the Application relation
  *
- * @method     \App\Models\SmsCallLogQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \App\Models\ApplicationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildApplicationRequest findOne(ConnectionInterface $con = null) Return the first ChildApplicationRequest matching the query
  * @method     ChildApplicationRequest findOneOrCreate(ConnectionInterface $con = null) Return the first ChildApplicationRequest matching the query, or a new ChildApplicationRequest object populated from the query conditions when no match is found
  *
  * @method     ChildApplicationRequest findOneById(int $id) Return the first ChildApplicationRequest filtered by the id column
+ * @method     ChildApplicationRequest findOneByApplicationId(int $application_id) Return the first ChildApplicationRequest filtered by the application_id column
  * @method     ChildApplicationRequest findOneByDescription(string $description) Return the first ChildApplicationRequest filtered by the description column
+ * @method     ChildApplicationRequest findOneByResponse(string $response) Return the first ChildApplicationRequest filtered by the response column
  * @method     ChildApplicationRequest findOneByCreatedAt(string $created_at) Return the first ChildApplicationRequest filtered by the created_at column
  * @method     ChildApplicationRequest findOneByUpdatedAt(string $updated_at) Return the first ChildApplicationRequest filtered by the updated_at column *
 
@@ -52,13 +58,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApplicationRequest requireOne(ConnectionInterface $con = null) Return the first ChildApplicationRequest matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildApplicationRequest requireOneById(int $id) Return the first ChildApplicationRequest filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildApplicationRequest requireOneByApplicationId(int $application_id) Return the first ChildApplicationRequest filtered by the application_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplicationRequest requireOneByDescription(string $description) Return the first ChildApplicationRequest filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildApplicationRequest requireOneByResponse(string $response) Return the first ChildApplicationRequest filtered by the response column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplicationRequest requireOneByCreatedAt(string $created_at) Return the first ChildApplicationRequest filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildApplicationRequest requireOneByUpdatedAt(string $updated_at) Return the first ChildApplicationRequest filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildApplicationRequest[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildApplicationRequest objects based on current ModelCriteria
  * @method     ChildApplicationRequest[]|ObjectCollection findById(int $id) Return ChildApplicationRequest objects filtered by the id column
+ * @method     ChildApplicationRequest[]|ObjectCollection findByApplicationId(int $application_id) Return ChildApplicationRequest objects filtered by the application_id column
  * @method     ChildApplicationRequest[]|ObjectCollection findByDescription(string $description) Return ChildApplicationRequest objects filtered by the description column
+ * @method     ChildApplicationRequest[]|ObjectCollection findByResponse(string $response) Return ChildApplicationRequest objects filtered by the response column
  * @method     ChildApplicationRequest[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildApplicationRequest objects filtered by the created_at column
  * @method     ChildApplicationRequest[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildApplicationRequest objects filtered by the updated_at column
  * @method     ChildApplicationRequest[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -153,7 +163,7 @@ abstract class ApplicationRequestQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, description, created_at, updated_at FROM application_request WHERE id = :p0';
+        $sql = 'SELECT id, application_id, description, response, created_at, updated_at FROM application_request WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -285,6 +295,49 @@ abstract class ApplicationRequestQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the application_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByApplicationId(1234); // WHERE application_id = 1234
+     * $query->filterByApplicationId(array(12, 34)); // WHERE application_id IN (12, 34)
+     * $query->filterByApplicationId(array('min' => 12)); // WHERE application_id > 12
+     * </code>
+     *
+     * @see       filterByApplication()
+     *
+     * @param     mixed $applicationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildApplicationRequestQuery The current query, for fluid interface
+     */
+    public function filterByApplicationId($applicationId = null, $comparison = null)
+    {
+        if (is_array($applicationId)) {
+            $useMinMax = false;
+            if (isset($applicationId['min'])) {
+                $this->addUsingAlias(ApplicationRequestTableMap::COL_APPLICATION_ID, $applicationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($applicationId['max'])) {
+                $this->addUsingAlias(ApplicationRequestTableMap::COL_APPLICATION_ID, $applicationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ApplicationRequestTableMap::COL_APPLICATION_ID, $applicationId, $comparison);
+    }
+
+    /**
      * Filter the query on the description column
      *
      * Example usage:
@@ -311,6 +364,35 @@ abstract class ApplicationRequestQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ApplicationRequestTableMap::COL_DESCRIPTION, $description, $comparison);
+    }
+
+    /**
+     * Filter the query on the response column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByResponse('fooValue');   // WHERE response = 'fooValue'
+     * $query->filterByResponse('%fooValue%'); // WHERE response LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $response The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildApplicationRequestQuery The current query, for fluid interface
+     */
+    public function filterByResponse($response = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($response)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $response)) {
+                $response = str_replace('*', '%', $response);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ApplicationRequestTableMap::COL_RESPONSE, $response, $comparison);
     }
 
     /**
@@ -400,40 +482,44 @@ abstract class ApplicationRequestQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \App\Models\SmsCallLog object
+     * Filter the query by a related \App\Models\Application object
      *
-     * @param \App\Models\SmsCallLog|ObjectCollection $smsCallLog the related object to use as filter
+     * @param \App\Models\Application|ObjectCollection $application The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return ChildApplicationRequestQuery The current query, for fluid interface
      */
-    public function filterBySmsCallLog($smsCallLog, $comparison = null)
+    public function filterByApplication($application, $comparison = null)
     {
-        if ($smsCallLog instanceof \App\Models\SmsCallLog) {
+        if ($application instanceof \App\Models\Application) {
             return $this
-                ->addUsingAlias(ApplicationRequestTableMap::COL_ID, $smsCallLog->getApplicationRequestId(), $comparison);
-        } elseif ($smsCallLog instanceof ObjectCollection) {
+                ->addUsingAlias(ApplicationRequestTableMap::COL_APPLICATION_ID, $application->getId(), $comparison);
+        } elseif ($application instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useSmsCallLogQuery()
-                ->filterByPrimaryKeys($smsCallLog->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ApplicationRequestTableMap::COL_APPLICATION_ID, $application->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterBySmsCallLog() only accepts arguments of type \App\Models\SmsCallLog or Collection');
+            throw new PropelException('filterByApplication() only accepts arguments of type \App\Models\Application or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the SmsCallLog relation
+     * Adds a JOIN clause to the query using the Application relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildApplicationRequestQuery The current query, for fluid interface
      */
-    public function joinSmsCallLog($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinApplication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('SmsCallLog');
+        $relationMap = $tableMap->getRelation('Application');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -448,14 +534,14 @@ abstract class ApplicationRequestQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'SmsCallLog');
+            $this->addJoinObject($join, 'Application');
         }
 
         return $this;
     }
 
     /**
-     * Use the SmsCallLog relation SmsCallLog object
+     * Use the Application relation Application object
      *
      * @see useQuery()
      *
@@ -463,13 +549,13 @@ abstract class ApplicationRequestQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \App\Models\SmsCallLogQuery A secondary query class using the current class as primary query
+     * @return \App\Models\ApplicationQuery A secondary query class using the current class as primary query
      */
-    public function useSmsCallLogQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useApplicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinSmsCallLog($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'SmsCallLog', '\App\Models\SmsCallLogQuery');
+            ->joinApplication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Application', '\App\Models\ApplicationQuery');
     }
 
     /**

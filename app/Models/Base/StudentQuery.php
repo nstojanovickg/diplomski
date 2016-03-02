@@ -28,7 +28,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudentQuery orderByLastName($order = Criteria::ASC) Order by the last_name column
  * @method     ChildStudentQuery orderByBirthPlace($order = Criteria::ASC) Order by the birth_place column
  * @method     ChildStudentQuery orderByBirthday($order = Criteria::ASC) Order by the birthday column
- * @method     ChildStudentQuery orderByAccountAmount($order = Criteria::ASC) Order by the account_amount column
  * @method     ChildStudentQuery orderByPhoneNumber($order = Criteria::ASC) Order by the phone_number column
  * @method     ChildStudentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildStudentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -41,7 +40,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudentQuery groupByLastName() Group by the last_name column
  * @method     ChildStudentQuery groupByBirthPlace() Group by the birth_place column
  * @method     ChildStudentQuery groupByBirthday() Group by the birthday column
- * @method     ChildStudentQuery groupByAccountAmount() Group by the account_amount column
  * @method     ChildStudentQuery groupByPhoneNumber() Group by the phone_number column
  * @method     ChildStudentQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildStudentQuery groupByUpdatedAt() Group by the updated_at column
@@ -66,11 +64,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudentQuery rightJoinApplication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Application relation
  * @method     ChildStudentQuery innerJoinApplication($relationAlias = null) Adds a INNER JOIN clause to the query using the Application relation
  *
- * @method     ChildStudentQuery leftJoinSmsCallLog($relationAlias = null) Adds a LEFT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildStudentQuery rightJoinSmsCallLog($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SmsCallLog relation
- * @method     ChildStudentQuery innerJoinSmsCallLog($relationAlias = null) Adds a INNER JOIN clause to the query using the SmsCallLog relation
- *
- * @method     \App\Models\CourseQuery|\App\Models\SchoolYearQuery|\App\Models\AdminUserQuery|\App\Models\ApplicationQuery|\App\Models\SmsCallLogQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \App\Models\CourseQuery|\App\Models\SchoolYearQuery|\App\Models\AdminUserQuery|\App\Models\ApplicationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildStudent findOne(ConnectionInterface $con = null) Return the first ChildStudent matching the query
  * @method     ChildStudent findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStudent matching the query, or a new ChildStudent object populated from the query conditions when no match is found
@@ -83,7 +77,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudent findOneByLastName(string $last_name) Return the first ChildStudent filtered by the last_name column
  * @method     ChildStudent findOneByBirthPlace(string $birth_place) Return the first ChildStudent filtered by the birth_place column
  * @method     ChildStudent findOneByBirthday(string $birthday) Return the first ChildStudent filtered by the birthday column
- * @method     ChildStudent findOneByAccountAmount(double $account_amount) Return the first ChildStudent filtered by the account_amount column
  * @method     ChildStudent findOneByPhoneNumber(string $phone_number) Return the first ChildStudent filtered by the phone_number column
  * @method     ChildStudent findOneByCreatedAt(string $created_at) Return the first ChildStudent filtered by the created_at column
  * @method     ChildStudent findOneByUpdatedAt(string $updated_at) Return the first ChildStudent filtered by the updated_at column *
@@ -99,7 +92,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudent requireOneByLastName(string $last_name) Return the first ChildStudent filtered by the last_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildStudent requireOneByBirthPlace(string $birth_place) Return the first ChildStudent filtered by the birth_place column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildStudent requireOneByBirthday(string $birthday) Return the first ChildStudent filtered by the birthday column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildStudent requireOneByAccountAmount(double $account_amount) Return the first ChildStudent filtered by the account_amount column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildStudent requireOneByPhoneNumber(string $phone_number) Return the first ChildStudent filtered by the phone_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildStudent requireOneByCreatedAt(string $created_at) Return the first ChildStudent filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildStudent requireOneByUpdatedAt(string $updated_at) Return the first ChildStudent filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -113,7 +105,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildStudent[]|ObjectCollection findByLastName(string $last_name) Return ChildStudent objects filtered by the last_name column
  * @method     ChildStudent[]|ObjectCollection findByBirthPlace(string $birth_place) Return ChildStudent objects filtered by the birth_place column
  * @method     ChildStudent[]|ObjectCollection findByBirthday(string $birthday) Return ChildStudent objects filtered by the birthday column
- * @method     ChildStudent[]|ObjectCollection findByAccountAmount(double $account_amount) Return ChildStudent objects filtered by the account_amount column
  * @method     ChildStudent[]|ObjectCollection findByPhoneNumber(string $phone_number) Return ChildStudent objects filtered by the phone_number column
  * @method     ChildStudent[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildStudent objects filtered by the created_at column
  * @method     ChildStudent[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildStudent objects filtered by the updated_at column
@@ -209,7 +200,7 @@ abstract class StudentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, identification_number, school_year_id, course_id, first_name, last_name, birth_place, birthday, account_amount, phone_number, created_at, updated_at FROM student WHERE id = :p0';
+        $sql = 'SELECT id, identification_number, school_year_id, course_id, first_name, last_name, birth_place, birthday, phone_number, created_at, updated_at FROM student WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -595,47 +586,6 @@ abstract class StudentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StudentTableMap::COL_BIRTHDAY, $birthday, $comparison);
-    }
-
-    /**
-     * Filter the query on the account_amount column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAccountAmount(1234); // WHERE account_amount = 1234
-     * $query->filterByAccountAmount(array(12, 34)); // WHERE account_amount IN (12, 34)
-     * $query->filterByAccountAmount(array('min' => 12)); // WHERE account_amount > 12
-     * </code>
-     *
-     * @param     mixed $accountAmount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildStudentQuery The current query, for fluid interface
-     */
-    public function filterByAccountAmount($accountAmount = null, $comparison = null)
-    {
-        if (is_array($accountAmount)) {
-            $useMinMax = false;
-            if (isset($accountAmount['min'])) {
-                $this->addUsingAlias(StudentTableMap::COL_ACCOUNT_AMOUNT, $accountAmount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($accountAmount['max'])) {
-                $this->addUsingAlias(StudentTableMap::COL_ACCOUNT_AMOUNT, $accountAmount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(StudentTableMap::COL_ACCOUNT_AMOUNT, $accountAmount, $comparison);
     }
 
     /**
@@ -1051,79 +1001,6 @@ abstract class StudentQuery extends ModelCriteria
         return $this
             ->joinApplication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Application', '\App\Models\ApplicationQuery');
-    }
-
-    /**
-     * Filter the query by a related \App\Models\SmsCallLog object
-     *
-     * @param \App\Models\SmsCallLog|ObjectCollection $smsCallLog the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildStudentQuery The current query, for fluid interface
-     */
-    public function filterBySmsCallLog($smsCallLog, $comparison = null)
-    {
-        if ($smsCallLog instanceof \App\Models\SmsCallLog) {
-            return $this
-                ->addUsingAlias(StudentTableMap::COL_ID, $smsCallLog->getStudentId(), $comparison);
-        } elseif ($smsCallLog instanceof ObjectCollection) {
-            return $this
-                ->useSmsCallLogQuery()
-                ->filterByPrimaryKeys($smsCallLog->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterBySmsCallLog() only accepts arguments of type \App\Models\SmsCallLog or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the SmsCallLog relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildStudentQuery The current query, for fluid interface
-     */
-    public function joinSmsCallLog($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('SmsCallLog');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'SmsCallLog');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the SmsCallLog relation SmsCallLog object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \App\Models\SmsCallLogQuery A secondary query class using the current class as primary query
-     */
-    public function useSmsCallLogQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinSmsCallLog($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'SmsCallLog', '\App\Models\SmsCallLogQuery');
     }
 
     /**

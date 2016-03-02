@@ -25,7 +25,6 @@ class SubjectRequest extends Request {
 		$id = $id_arr['Id'];
 		
 		return [
-			//unique:table,column,except,idColumn
 			'Name' => 'required|max:100|unique:subject,name,'.$id,
             'Code' => 'required|max:10|unique:subject,code,'.$id
 		];

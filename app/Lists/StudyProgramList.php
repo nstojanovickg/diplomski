@@ -46,7 +46,15 @@ class StudyProgramList extends BaseList {
 	 *
 	 */
 	protected function createQuery($array, $search){
-		$this->objects = StudyProgramQuery::create();
+		$this->objects = StudyProgramQuery::create()
+			->useCourseQuery()
+				->orderByName()
+			->endUse()
+			->orderByYear()
+			->orderBySemester()
+			->useSubjectQuery()
+				->orderByName()
+			->endUse();
         if(isset($array['SubjectId']) && $array['SubjectId'] !== "") $this->objects->where("StudyProgram.subject_id = ?",$array['SubjectId']);
         if(isset($array['CourseId']) && $array['CourseId'] !== "") $this->objects->where("StudyProgram.course_id = ?",$array['CourseId']);
 		if(isset($array['Year']) && $array['Year'] !== "") $this->objects->where("StudyProgram.year = ?",$array['Year']);

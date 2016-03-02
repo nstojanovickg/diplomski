@@ -16,7 +16,10 @@ use App\Models\Base\Professor as BaseProfessor;
  */
 class Professor extends BaseProfessor
 {
-    public function __toString(){
-        return $this->getFirstName(). " " .$this->getLastName();
+    public function toString($oposite = false){
+        if(!$oposite)
+            return $this->getFirstName(). " " .$this->getLastName();
+        else
+            return $this->getLastName(). " " .$this->getFirstName();
     }
 }

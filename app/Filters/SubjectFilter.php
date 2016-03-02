@@ -7,15 +7,7 @@ class SubjectFilter extends Form
     public function buildForm()
     {
         $this
-            ->add('Name', 'text', [
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ])
-            ->add('Code', 'text', [
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ]
-            ]);
+            ->add('Name', 'text')
+            ->add('Code', 'text');
     }
 }

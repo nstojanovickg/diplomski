@@ -115,16 +115,24 @@
     padding-top: 0;
 }
 
-.form-group.form-filter .control-label{
-    width: 100%;
+.form-filter {
+    padding: 5px 5px 0 5px;
+}
+
+.form-inline .form-group {
+    margin-bottom: 10px !important;
+    margin-right: 10px !important;
+}
+
+.form-inline .form-group .control-label{
+    display: block;
 }
 
 .list-pagination .pagination{
     margin-bottom: 0;
+    margin-top: 0;
 }
-.list-pagination{
-    padding-left: 5px;
-}
+
 .pagination-info{
     font-size: 11px;
 }
@@ -136,4 +144,8 @@
 
 .panel {
     background-color: #f0f0f0;
+}
+
+#professor_name {
+        margin-top: 0px !important;
 }

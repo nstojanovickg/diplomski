@@ -10,65 +10,68 @@ class EngagementFilter extends Form
 {
     public function buildForm()
     {
-        $subjects = SubjectQuery::create()->orderByName()->find();
-        $subjects_arr = array('' => '');
+        if(\Auth::user()->getStatus() !== 'professor'){
+			$this->add('ProfessorId', 'select', [
+				'label' => 'Professor',
+				'choices' => $this->getProfessors()
+            ]);
+		}
+        $this
+            ->add('SubjectId', 'select', [
+                'label' => 'Subject',
+                'choices' => $this->getSubjects()
+            ])
+            ->add('CourseId', 'select', [
+                'label' => 'Course',
+                'choices' => $this->getCourses()
+            ])
+            ->add('SchoolYearId', 'select', [
+                'label' => 'School Year',
+                'choices' => $this->getSchoolYears()
+            ]);
+    }
+	
+	private function getProfessors() {
+		$professors = ProfessorQuery::create()->orderByLastName()->orderByFirstName()->find();
+		$professors_arr = ['' => ''];
+		foreach($professors as $professor){
+			$name = $professor->toString(true);
+			$id = $professor->getId();
+			$professors_arr[$id] = $name;
+		}
+		return $professors_arr;
+	}
+	
+	private function getSubjects() {
+		$subjects = SubjectQuery::create()->orderByName()->find();
+        $subjects_arr = ['' => ''];
         foreach($subjects as $subject){
             $name = $subject->__toString();
             $id = $subject->getId();
             $subjects_arr[$id] = $name;
         }
-        $courses = CourseQuery::create()->find();
-        $courses_arr = array('' => '');
+		return $subjects_arr;
+	}
+	
+	private function getCourses() {
+		$courses = CourseQuery::create()->orderByName()->find();
+        $courses_arr = ['' => ''];
         foreach($courses as $course){
             $name = $course->__toString();
             $id = $course->getId();
             $courses_arr[$id] = $name;
         }
-        $schoolYears = SchoolYearQuery::create()->orderByYear()->find();
-        $schoolYears_arr = array('' => '');
+		return $courses_arr;
+	}
+	
+	private function getSchoolYears() {
+		$schoolYears = SchoolYearQuery::create()->orderByYear('desc')->find();
+        $school_years_arr = ['' => ''];
         foreach($schoolYears as $schoolYear){
             $name = $schoolYear->__toString();
             $id = $schoolYear->getId();
-            $schoolYears_arr[$id] = $name;
+            $school_years_arr[$id] = $name;
         }
-        if(\Auth::user()->getStatus() !== 'professor'){
-            $professors = ProfessorQuery::create()->orderByLastName()->orderByFirstName()->find();
-            $professors_arr = array('' => '');
-            foreach($professors as $professor){
-                $name = $professor->__toString();
-                $id = $professor->getId();
-                $professors_arr[$id] = $name;
-            }
-			$this
-                ->add('ProfessorId', 'select', [
-                    'label' => 'Professor',
-                    'wrapper' => [
-                        'class' => 'form-group form-filter'
-                    ],
-                    'choices' => $professors_arr
-                ]);
-		}
-        $this
-            ->add('SubjectId', 'select', [
-                'label' => 'Subject',
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
-                'choices' => $subjects_arr
-            ])
-            ->add('CourseId', 'select', [
-                'label' => 'Course',
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
-                'choices' => $courses_arr
-            ])
-            ->add('SchoolYearId', 'select', [
-                'label' => 'School Year',
-                'wrapper' => [
-                    'class' => 'form-group form-filter'
-                ],
-                'choices' => $schoolYears_arr
-            ]);
-    }
+		return $school_years_arr;
+	}
 }

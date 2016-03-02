@@ -25,15 +25,14 @@ class ProfessorController extends Controller {
 		$data_arr = $professorList->getDataArr();
 		$paginationForm = $professorList->getPaginationForm();
 		$filter = session('professor_filter');
+		session(['attribute' => \Lang::get('general.PROFESSOR_OBJ')]);
 		
 		$form_filter = $formBuilder->create('App\Filters\ProfessorFilter', [
 			'method' => 'PATCH',
 			'action' => ['ProfessorController@index'],
-			'model'  => $filter
+			'model'  => $filter,
+			'class'  => 'form-inline'
 		]);
-		
-		session(['attribute' => \Lang::get('general.PROFESSORS')]);
-		session(['attribute' => \Lang::get('general.PROFESSOR')]);
         
 		return view('list', [
 								'controller' => 'ProfessorController',
@@ -41,7 +40,7 @@ class ProfessorController extends Controller {
 								'keys' => $keys,
 								'perm_path' => $this->main_page,
 								'path' => $this->main_page,
-								'title' => 'PROFESSOR',
+								'title' => 'PROFESSORS',
 								'filter' => $form_filter,
 								'pagination' => $paginationForm,
 								'add' => true,
@@ -64,10 +63,10 @@ class ProfessorController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'PROFESSOR';
-		$action = 'ADD';
+		$action = 'ADD_OBJ';
 		$path = $this->main_page;
 		$back = $this->main_page;
-		session(['attribute' => \Lang::get('general.PROFESSOR')]);
+		session(['attribute' => \Lang::get('general.PROFESSOR_OBJ')]);
 		
 		return view('manage', compact('form', 'form_name', 'action', 'path', 'back'));
 	}
@@ -119,9 +118,9 @@ class ProfessorController extends Controller {
 			//'class' => 'form-horizontal'
 		]);
 		$form_name = 'PROFESSOR';
-		$action = 'EDIT';
+		$action = 'EDIT_OBJ';
 		$path = $this->main_page;
-		session(['attribute' => \Lang::get('general.PROFESSOR')]);
+		session(['attribute' => \Lang::get('general.PROFESSOR_OBJ')]);
         
 		return view('manage', compact('form', 'form_name', 'action', 'path'));
 	}

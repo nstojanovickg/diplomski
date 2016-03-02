@@ -5,17 +5,16 @@ namespace App\Models\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use App\Models\Application as ChildApplication;
+use App\Models\ApplicationQuery as ChildApplicationQuery;
 use App\Models\ApplicationRequest as ChildApplicationRequest;
 use App\Models\ApplicationRequestQuery as ChildApplicationRequestQuery;
-use App\Models\SmsCallLog as ChildSmsCallLog;
-use App\Models\SmsCallLogQuery as ChildSmsCallLogQuery;
 use App\Models\Map\ApplicationRequestTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -72,10 +71,22 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the application_id field.
+     * @var        int
+     */
+    protected $application_id;
+
+    /**
      * The value for the description field.
      * @var        string
      */
     protected $description;
+
+    /**
+     * The value for the response field.
+     * @var        string
+     */
+    protected $response;
 
     /**
      * The value for the created_at field.
@@ -90,10 +101,9 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildSmsCallLog[] Collection to store aggregation of ChildSmsCallLog objects.
+     * @var        ChildApplication
      */
-    protected $collSmsCallLogs;
-    protected $collSmsCallLogsPartial;
+    protected $aApplication;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -102,12 +112,6 @@ abstract class ApplicationRequest implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildSmsCallLog[]
-     */
-    protected $smsCallLogsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of App\Models\Base\ApplicationRequest object.
@@ -337,6 +341,16 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     }
 
     /**
+     * Get the [application_id] column value.
+     *
+     * @return int
+     */
+    public function getApplicationId()
+    {
+        return $this->application_id;
+    }
+
+    /**
      * Get the [description] column value.
      *
      * @return string
@@ -344,6 +358,16 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Get the [response] column value.
+     *
+     * @return string
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
     /**
@@ -407,6 +431,30 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     } // setId()
 
     /**
+     * Set the value of [application_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\App\Models\ApplicationRequest The current object (for fluent API support)
+     */
+    public function setApplicationId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->application_id !== $v) {
+            $this->application_id = $v;
+            $this->modifiedColumns[ApplicationRequestTableMap::COL_APPLICATION_ID] = true;
+        }
+
+        if ($this->aApplication !== null && $this->aApplication->getId() !== $v) {
+            $this->aApplication = null;
+        }
+
+        return $this;
+    } // setApplicationId()
+
+    /**
      * Set the value of [description] column.
      *
      * @param string $v new value
@@ -425,6 +473,26 @@ abstract class ApplicationRequest implements ActiveRecordInterface
 
         return $this;
     } // setDescription()
+
+    /**
+     * Set the value of [response] column.
+     *
+     * @param string $v new value
+     * @return $this|\App\Models\ApplicationRequest The current object (for fluent API support)
+     */
+    public function setResponse($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->response !== $v) {
+            $this->response = $v;
+            $this->modifiedColumns[ApplicationRequestTableMap::COL_RESPONSE] = true;
+        }
+
+        return $this;
+    } // setResponse()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -505,16 +573,22 @@ abstract class ApplicationRequest implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ApplicationRequestTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ApplicationRequestTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ApplicationRequestTableMap::translateFieldName('ApplicationId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->application_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ApplicationRequestTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
             $this->description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ApplicationRequestTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ApplicationRequestTableMap::translateFieldName('Response', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->response = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ApplicationRequestTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ApplicationRequestTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ApplicationRequestTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -527,7 +601,7 @@ abstract class ApplicationRequest implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = ApplicationRequestTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ApplicationRequestTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\App\\Models\\ApplicationRequest'), 0, $e);
@@ -549,6 +623,9 @@ abstract class ApplicationRequest implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aApplication !== null && $this->application_id !== $this->aApplication->getId()) {
+            $this->aApplication = null;
+        }
     } // ensureConsistency
 
     /**
@@ -588,8 +665,7 @@ abstract class ApplicationRequest implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collSmsCallLogs = null;
-
+            $this->aApplication = null;
         } // if (deep)
     }
 
@@ -701,6 +777,18 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aApplication !== null) {
+                if ($this->aApplication->isModified() || $this->aApplication->isNew()) {
+                    $affectedRows += $this->aApplication->save($con);
+                }
+                $this->setApplication($this->aApplication);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -710,23 +798,6 @@ abstract class ApplicationRequest implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->smsCallLogsScheduledForDeletion !== null) {
-                if (!$this->smsCallLogsScheduledForDeletion->isEmpty()) {
-                    \App\Models\SmsCallLogQuery::create()
-                        ->filterByPrimaryKeys($this->smsCallLogsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->smsCallLogsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collSmsCallLogs !== null) {
-                foreach ($this->collSmsCallLogs as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -758,8 +829,14 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
+        if ($this->isColumnModified(ApplicationRequestTableMap::COL_APPLICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'application_id';
+        }
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = 'description';
+        }
+        if ($this->isColumnModified(ApplicationRequestTableMap::COL_RESPONSE)) {
+            $modifiedColumns[':p' . $index++]  = 'response';
         }
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
@@ -781,8 +858,14 @@ abstract class ApplicationRequest implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
+                    case 'application_id':
+                        $stmt->bindValue($identifier, $this->application_id, PDO::PARAM_INT);
+                        break;
                     case 'description':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                        break;
+                    case 'response':
+                        $stmt->bindValue($identifier, $this->response, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -856,12 +939,18 @@ abstract class ApplicationRequest implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getDescription();
+                return $this->getApplicationId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getDescription();
                 break;
             case 3:
+                return $this->getResponse();
+                break;
+            case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -895,22 +984,24 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         $keys = ApplicationRequestTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getDescription(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[1] => $this->getApplicationId(),
+            $keys[2] => $this->getDescription(),
+            $keys[3] => $this->getResponse(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
 
         $utc = new \DateTimeZone('utc');
-        if ($result[$keys[2]] instanceof \DateTime) {
+        if ($result[$keys[4]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[2]];
-            $result[$keys[2]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+            $dateTime = clone $result[$keys[4]];
+            $result[$keys[4]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
-        if ($result[$keys[3]] instanceof \DateTime) {
+        if ($result[$keys[5]] instanceof \DateTime) {
             // When changing timezone we don't want to change existing instances
-            $dateTime = clone $result[$keys[3]];
-            $result[$keys[3]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
+            $dateTime = clone $result[$keys[5]];
+            $result[$keys[5]] = $dateTime->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -919,20 +1010,20 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collSmsCallLogs) {
+            if (null !== $this->aApplication) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'smsCallLogs';
+                        $key = 'application';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'sms_call_logs';
+                        $key = 'application';
                         break;
                     default:
-                        $key = 'SmsCallLogs';
+                        $key = 'Application';
                 }
 
-                $result[$key] = $this->collSmsCallLogs->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->aApplication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -972,12 +1063,18 @@ abstract class ApplicationRequest implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setDescription($value);
+                $this->setApplicationId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setDescription($value);
                 break;
             case 3:
+                $this->setResponse($value);
+                break;
+            case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1010,13 +1107,19 @@ abstract class ApplicationRequest implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setDescription($arr[$keys[1]]);
+            $this->setApplicationId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setCreatedAt($arr[$keys[2]]);
+            $this->setDescription($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setUpdatedAt($arr[$keys[3]]);
+            $this->setResponse($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setCreatedAt($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setUpdatedAt($arr[$keys[5]]);
         }
     }
 
@@ -1062,8 +1165,14 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_ID)) {
             $criteria->add(ApplicationRequestTableMap::COL_ID, $this->id);
         }
+        if ($this->isColumnModified(ApplicationRequestTableMap::COL_APPLICATION_ID)) {
+            $criteria->add(ApplicationRequestTableMap::COL_APPLICATION_ID, $this->application_id);
+        }
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_DESCRIPTION)) {
             $criteria->add(ApplicationRequestTableMap::COL_DESCRIPTION, $this->description);
+        }
+        if ($this->isColumnModified(ApplicationRequestTableMap::COL_RESPONSE)) {
+            $criteria->add(ApplicationRequestTableMap::COL_RESPONSE, $this->response);
         }
         if ($this->isColumnModified(ApplicationRequestTableMap::COL_CREATED_AT)) {
             $criteria->add(ApplicationRequestTableMap::COL_CREATED_AT, $this->created_at);
@@ -1157,23 +1266,11 @@ abstract class ApplicationRequest implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setApplicationId($this->getApplicationId());
         $copyObj->setDescription($this->getDescription());
+        $copyObj->setResponse($this->getResponse());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getSmsCallLogs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addSmsCallLog($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1202,313 +1299,55 @@ abstract class ApplicationRequest implements ActiveRecordInterface
         return $copyObj;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a ChildApplication object.
      *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('SmsCallLog' == $relationName) {
-            return $this->initSmsCallLogs();
-        }
-    }
-
-    /**
-     * Clears out the collSmsCallLogs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addSmsCallLogs()
-     */
-    public function clearSmsCallLogs()
-    {
-        $this->collSmsCallLogs = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collSmsCallLogs collection loaded partially.
-     */
-    public function resetPartialSmsCallLogs($v = true)
-    {
-        $this->collSmsCallLogsPartial = $v;
-    }
-
-    /**
-     * Initializes the collSmsCallLogs collection.
-     *
-     * By default this just sets the collSmsCallLogs collection to an empty array (like clearcollSmsCallLogs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initSmsCallLogs($overrideExisting = true)
-    {
-        if (null !== $this->collSmsCallLogs && !$overrideExisting) {
-            return;
-        }
-        $this->collSmsCallLogs = new ObjectCollection();
-        $this->collSmsCallLogs->setModel('\App\Models\SmsCallLog');
-    }
-
-    /**
-     * Gets an array of ChildSmsCallLog objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildApplicationRequest is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     * @throws PropelException
-     */
-    public function getSmsCallLogs(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                // return empty collection
-                $this->initSmsCallLogs();
-            } else {
-                $collSmsCallLogs = ChildSmsCallLogQuery::create(null, $criteria)
-                    ->filterByApplicationRequest($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collSmsCallLogsPartial && count($collSmsCallLogs)) {
-                        $this->initSmsCallLogs(false);
-
-                        foreach ($collSmsCallLogs as $obj) {
-                            if (false == $this->collSmsCallLogs->contains($obj)) {
-                                $this->collSmsCallLogs->append($obj);
-                            }
-                        }
-
-                        $this->collSmsCallLogsPartial = true;
-                    }
-
-                    return $collSmsCallLogs;
-                }
-
-                if ($partial && $this->collSmsCallLogs) {
-                    foreach ($this->collSmsCallLogs as $obj) {
-                        if ($obj->isNew()) {
-                            $collSmsCallLogs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collSmsCallLogs = $collSmsCallLogs;
-                $this->collSmsCallLogsPartial = false;
-            }
-        }
-
-        return $this->collSmsCallLogs;
-    }
-
-    /**
-     * Sets a collection of ChildSmsCallLog objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $smsCallLogs A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildApplicationRequest The current object (for fluent API support)
-     */
-    public function setSmsCallLogs(Collection $smsCallLogs, ConnectionInterface $con = null)
-    {
-        /** @var ChildSmsCallLog[] $smsCallLogsToDelete */
-        $smsCallLogsToDelete = $this->getSmsCallLogs(new Criteria(), $con)->diff($smsCallLogs);
-
-
-        $this->smsCallLogsScheduledForDeletion = $smsCallLogsToDelete;
-
-        foreach ($smsCallLogsToDelete as $smsCallLogRemoved) {
-            $smsCallLogRemoved->setApplicationRequest(null);
-        }
-
-        $this->collSmsCallLogs = null;
-        foreach ($smsCallLogs as $smsCallLog) {
-            $this->addSmsCallLog($smsCallLog);
-        }
-
-        $this->collSmsCallLogs = $smsCallLogs;
-        $this->collSmsCallLogsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related SmsCallLog objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related SmsCallLog objects.
-     * @throws PropelException
-     */
-    public function countSmsCallLogs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collSmsCallLogsPartial && !$this->isNew();
-        if (null === $this->collSmsCallLogs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSmsCallLogs) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getSmsCallLogs());
-            }
-
-            $query = ChildSmsCallLogQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByApplicationRequest($this)
-                ->count($con);
-        }
-
-        return count($this->collSmsCallLogs);
-    }
-
-    /**
-     * Method called to associate a ChildSmsCallLog object to this object
-     * through the ChildSmsCallLog foreign key attribute.
-     *
-     * @param  ChildSmsCallLog $l ChildSmsCallLog
+     * @param  ChildApplication $v
      * @return $this|\App\Models\ApplicationRequest The current object (for fluent API support)
+     * @throws PropelException
      */
-    public function addSmsCallLog(ChildSmsCallLog $l)
+    public function setApplication(ChildApplication $v = null)
     {
-        if ($this->collSmsCallLogs === null) {
-            $this->initSmsCallLogs();
-            $this->collSmsCallLogsPartial = true;
+        if ($v === null) {
+            $this->setApplicationId(NULL);
+        } else {
+            $this->setApplicationId($v->getId());
         }
 
-        if (!$this->collSmsCallLogs->contains($l)) {
-            $this->doAddSmsCallLog($l);
+        $this->aApplication = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildApplication object, it will not be re-added.
+        if ($v !== null) {
+            $v->addApplicationRequest($this);
         }
 
-        return $this;
-    }
-
-    /**
-     * @param ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to add.
-     */
-    protected function doAddSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        $this->collSmsCallLogs[]= $smsCallLog;
-        $smsCallLog->setApplicationRequest($this);
-    }
-
-    /**
-     * @param  ChildSmsCallLog $smsCallLog The ChildSmsCallLog object to remove.
-     * @return $this|ChildApplicationRequest The current object (for fluent API support)
-     */
-    public function removeSmsCallLog(ChildSmsCallLog $smsCallLog)
-    {
-        if ($this->getSmsCallLogs()->contains($smsCallLog)) {
-            $pos = $this->collSmsCallLogs->search($smsCallLog);
-            $this->collSmsCallLogs->remove($pos);
-            if (null === $this->smsCallLogsScheduledForDeletion) {
-                $this->smsCallLogsScheduledForDeletion = clone $this->collSmsCallLogs;
-                $this->smsCallLogsScheduledForDeletion->clear();
-            }
-            $this->smsCallLogsScheduledForDeletion[]= clone $smsCallLog;
-            $smsCallLog->setApplicationRequest(null);
-        }
 
         return $this;
     }
 
 
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this ApplicationRequest is new, it will return
-     * an empty collection; or if this ApplicationRequest has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
+     * Get the associated ChildApplication object
      *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in ApplicationRequest.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildApplication The associated ChildApplication object.
+     * @throws PropelException
      */
-    public function getSmsCallLogsJoinPeriod(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getApplication(ConnectionInterface $con = null)
     {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Period', $joinBehavior);
+        if ($this->aApplication === null && ($this->application_id !== null)) {
+            $this->aApplication = ChildApplicationQuery::create()->findPk($this->application_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aApplication->addApplicationRequests($this);
+             */
+        }
 
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this ApplicationRequest is new, it will return
-     * an empty collection; or if this ApplicationRequest has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in ApplicationRequest.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinSubject(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Subject', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this ApplicationRequest is new, it will return
-     * an empty collection; or if this ApplicationRequest has previously
-     * been saved, it will retrieve related SmsCallLogs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in ApplicationRequest.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildSmsCallLog[] List of ChildSmsCallLog objects
-     */
-    public function getSmsCallLogsJoinStudent(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildSmsCallLogQuery::create(null, $criteria);
-        $query->joinWith('Student', $joinBehavior);
-
-        return $this->getSmsCallLogs($query, $con);
+        return $this->aApplication;
     }
 
     /**
@@ -1518,8 +1357,13 @@ abstract class ApplicationRequest implements ActiveRecordInterface
      */
     public function clear()
     {
+        if (null !== $this->aApplication) {
+            $this->aApplication->removeApplicationRequest($this);
+        }
         $this->id = null;
+        $this->application_id = null;
         $this->description = null;
+        $this->response = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1540,14 +1384,9 @@ abstract class ApplicationRequest implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collSmsCallLogs) {
-                foreach ($this->collSmsCallLogs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        $this->collSmsCallLogs = null;
+        $this->aApplication = null;
     }
 
     /**

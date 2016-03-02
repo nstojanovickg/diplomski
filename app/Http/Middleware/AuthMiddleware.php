@@ -67,7 +67,7 @@ class AuthMiddleware implements Middleware {
 			    return redirect()->intended('dashboard');
 			}
 		}
-		\Session::regenerateToken();
+		//\Session::regenerateToken();
 		return $next($request);
 	}
 

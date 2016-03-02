@@ -59,7 +59,7 @@ class ApplicationTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 11;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ApplicationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /**
      * the column name for the id field
@@ -95,11 +95,6 @@ class ApplicationTableMap extends TableMap
      * the column name for the school_year_id field
      */
     const COL_SCHOOL_YEAR_ID = 'application.school_year_id';
-
-    /**
-     * the column name for the oral_exam_invitation_id field
-     */
-    const COL_ORAL_EXAM_INVITATION_ID = 'application.oral_exam_invitation_id';
 
     /**
      * the column name for the application_date field
@@ -143,11 +138,11 @@ class ApplicationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'StudentId', 'SubjectId', 'PeriodId', 'SchoolYearId', 'OralExamInvitationId', 'ApplicationDate', 'ExamDate', 'ExamTime', 'ExamScore', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'studentId', 'subjectId', 'periodId', 'schoolYearId', 'oralExamInvitationId', 'applicationDate', 'examDate', 'examTime', 'examScore', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ApplicationTableMap::COL_ID, ApplicationTableMap::COL_STUDENT_ID, ApplicationTableMap::COL_SUBJECT_ID, ApplicationTableMap::COL_PERIOD_ID, ApplicationTableMap::COL_SCHOOL_YEAR_ID, ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID, ApplicationTableMap::COL_APPLICATION_DATE, ApplicationTableMap::COL_EXAM_DATE, ApplicationTableMap::COL_EXAM_TIME, ApplicationTableMap::COL_EXAM_SCORE, ApplicationTableMap::COL_CREATED_AT, ApplicationTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'student_id', 'subject_id', 'period_id', 'school_year_id', 'oral_exam_invitation_id', 'application_date', 'exam_date', 'exam_time', 'exam_score', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id', 'StudentId', 'SubjectId', 'PeriodId', 'SchoolYearId', 'ApplicationDate', 'ExamDate', 'ExamTime', 'ExamScore', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'studentId', 'subjectId', 'periodId', 'schoolYearId', 'applicationDate', 'examDate', 'examTime', 'examScore', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ApplicationTableMap::COL_ID, ApplicationTableMap::COL_STUDENT_ID, ApplicationTableMap::COL_SUBJECT_ID, ApplicationTableMap::COL_PERIOD_ID, ApplicationTableMap::COL_SCHOOL_YEAR_ID, ApplicationTableMap::COL_APPLICATION_DATE, ApplicationTableMap::COL_EXAM_DATE, ApplicationTableMap::COL_EXAM_TIME, ApplicationTableMap::COL_EXAM_SCORE, ApplicationTableMap::COL_CREATED_AT, ApplicationTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'student_id', 'subject_id', 'period_id', 'school_year_id', 'application_date', 'exam_date', 'exam_time', 'exam_score', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -157,11 +152,11 @@ class ApplicationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'StudentId' => 1, 'SubjectId' => 2, 'PeriodId' => 3, 'SchoolYearId' => 4, 'OralExamInvitationId' => 5, 'ApplicationDate' => 6, 'ExamDate' => 7, 'ExamTime' => 8, 'ExamScore' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'studentId' => 1, 'subjectId' => 2, 'periodId' => 3, 'schoolYearId' => 4, 'oralExamInvitationId' => 5, 'applicationDate' => 6, 'examDate' => 7, 'examTime' => 8, 'examScore' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(ApplicationTableMap::COL_ID => 0, ApplicationTableMap::COL_STUDENT_ID => 1, ApplicationTableMap::COL_SUBJECT_ID => 2, ApplicationTableMap::COL_PERIOD_ID => 3, ApplicationTableMap::COL_SCHOOL_YEAR_ID => 4, ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID => 5, ApplicationTableMap::COL_APPLICATION_DATE => 6, ApplicationTableMap::COL_EXAM_DATE => 7, ApplicationTableMap::COL_EXAM_TIME => 8, ApplicationTableMap::COL_EXAM_SCORE => 9, ApplicationTableMap::COL_CREATED_AT => 10, ApplicationTableMap::COL_UPDATED_AT => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'student_id' => 1, 'subject_id' => 2, 'period_id' => 3, 'school_year_id' => 4, 'oral_exam_invitation_id' => 5, 'application_date' => 6, 'exam_date' => 7, 'exam_time' => 8, 'exam_score' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'StudentId' => 1, 'SubjectId' => 2, 'PeriodId' => 3, 'SchoolYearId' => 4, 'ApplicationDate' => 5, 'ExamDate' => 6, 'ExamTime' => 7, 'ExamScore' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'studentId' => 1, 'subjectId' => 2, 'periodId' => 3, 'schoolYearId' => 4, 'applicationDate' => 5, 'examDate' => 6, 'examTime' => 7, 'examScore' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        self::TYPE_COLNAME       => array(ApplicationTableMap::COL_ID => 0, ApplicationTableMap::COL_STUDENT_ID => 1, ApplicationTableMap::COL_SUBJECT_ID => 2, ApplicationTableMap::COL_PERIOD_ID => 3, ApplicationTableMap::COL_SCHOOL_YEAR_ID => 4, ApplicationTableMap::COL_APPLICATION_DATE => 5, ApplicationTableMap::COL_EXAM_DATE => 6, ApplicationTableMap::COL_EXAM_TIME => 7, ApplicationTableMap::COL_EXAM_SCORE => 8, ApplicationTableMap::COL_CREATED_AT => 9, ApplicationTableMap::COL_UPDATED_AT => 10, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'student_id' => 1, 'subject_id' => 2, 'period_id' => 3, 'school_year_id' => 4, 'application_date' => 5, 'exam_date' => 6, 'exam_time' => 7, 'exam_score' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -186,7 +181,6 @@ class ApplicationTableMap extends TableMap
         $this->addForeignKey('subject_id', 'SubjectId', 'INTEGER', 'subject', 'id', true, null, null);
         $this->addForeignKey('period_id', 'PeriodId', 'INTEGER', 'period', 'id', true, null, null);
         $this->addForeignKey('school_year_id', 'SchoolYearId', 'INTEGER', 'school_year', 'id', true, null, null);
-        $this->addForeignKey('oral_exam_invitation_id', 'OralExamInvitationId', 'INTEGER', 'oral_exam_invitation', 'id', false, null, null);
         $this->addColumn('application_date', 'ApplicationDate', 'DATE', true, null, null);
         $this->addColumn('exam_date', 'ExamDate', 'DATE', false, null, null);
         $this->addColumn('exam_time', 'ExamTime', 'TIME', false, null, '09:00:00');
@@ -200,13 +194,6 @@ class ApplicationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OralExamInvitation', '\\App\\Models\\OralExamInvitation', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':oral_exam_invitation_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
         $this->addRelation('Period', '\\App\\Models\\Period', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
@@ -235,6 +222,13 @@ class ApplicationTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, null, false);
+        $this->addRelation('ApplicationRequest', '\\App\\Models\\ApplicationRequest', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':application_id',
+    1 => ':id',
+  ),
+), null, null, 'ApplicationRequests', false);
     } // buildRelations()
 
     /**
@@ -396,7 +390,6 @@ class ApplicationTableMap extends TableMap
             $criteria->addSelectColumn(ApplicationTableMap::COL_SUBJECT_ID);
             $criteria->addSelectColumn(ApplicationTableMap::COL_PERIOD_ID);
             $criteria->addSelectColumn(ApplicationTableMap::COL_SCHOOL_YEAR_ID);
-            $criteria->addSelectColumn(ApplicationTableMap::COL_ORAL_EXAM_INVITATION_ID);
             $criteria->addSelectColumn(ApplicationTableMap::COL_APPLICATION_DATE);
             $criteria->addSelectColumn(ApplicationTableMap::COL_EXAM_DATE);
             $criteria->addSelectColumn(ApplicationTableMap::COL_EXAM_TIME);
@@ -409,7 +402,6 @@ class ApplicationTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.subject_id');
             $criteria->addSelectColumn($alias . '.period_id');
             $criteria->addSelectColumn($alias . '.school_year_id');
-            $criteria->addSelectColumn($alias . '.oral_exam_invitation_id');
             $criteria->addSelectColumn($alias . '.application_date');
             $criteria->addSelectColumn($alias . '.exam_date');
             $criteria->addSelectColumn($alias . '.exam_time');
